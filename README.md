@@ -8,7 +8,7 @@ Verbum is an open-source TypeScript framework and native macOS app for orchestra
 
 - Site: [verbum-ai.vercel.app](https://verbum-ai.vercel.app)
 - Docs: [verbum-ai.vercel.app/docs](https://verbum-ai.vercel.app/docs)
-- Framework tarball: [github.com/Bbasche/verbum-ai/releases/latest/download/verbum-ai-0.1.0.tgz](https://github.com/Bbasche/verbum-ai/releases/latest/download/verbum-ai-0.1.0.tgz)
+- npm: [npmjs.com/package/verbum-ai](https://www.npmjs.com/package/verbum-ai)
 - Mac app DMG: [github.com/Bbasche/verbum-ai/releases/latest/download/Verbum.dmg](https://github.com/Bbasche/verbum-ai/releases/latest/download/Verbum.dmg)
 - Mac app setup: [github.com/Bbasche/verbum-ai/blob/main/docs/mac-app-setup.md](https://github.com/Bbasche/verbum-ai/blob/main/docs/mac-app-setup.md)
 - Package docs: [github.com/Bbasche/verbum-ai/blob/main/packages/verbum/README.md](https://github.com/Bbasche/verbum-ai/blob/main/packages/verbum/README.md)
@@ -16,7 +16,7 @@ Verbum is an open-source TypeScript framework and native macOS app for orchestra
 ## Install The Framework
 
 ```bash
-npm install https://github.com/Bbasche/verbum-ai/releases/latest/download/verbum-ai-0.1.0.tgz
+npm install verbum-ai
 ```
 
 ```ts

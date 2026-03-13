@@ -7,7 +7,7 @@ Everything is a conversation.
 ## Install
 
 ```bash
-npm install https://github.com/Bbasche/verbum-ai/releases/latest/download/verbum-ai-0.1.0.tgz
+npm install verbum-ai
 ```
 
 ## Quick start

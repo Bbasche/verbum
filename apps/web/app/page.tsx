@@ -48,7 +48,7 @@ export default function HomePage() {
           <div className="wide">
             <div className="icmd">
               <span className="p">$</span>
-              <span className="c">npm install https://github.com/Bbasche/verbum-ai/releases/latest/download/verbum-ai-0.1.0.tgz</span>
+              <span className="c">npm install verbum-ai</span>
             </div>
             <div className="ibadges">
               <span className="badge g">MIT</span>

@@ -32,11 +32,8 @@ export default function DocsPage() {
             <a href="/download/mac" className="btnp">
               Download for macOS
             </a>
-            <a
-              href="https://github.com/Bbasche/verbum-ai/releases/latest/download/verbum-ai-0.1.0.tgz"
-              className="btns"
-            >
-              Download framework tarball
+            <a href="https://www.npmjs.com/package/verbum-ai" className="btns">
+              View npm package
             </a>
           </div>
         </div>
@@ -50,7 +47,7 @@ export default function DocsPage() {
 open https://verbum-ai.vercel.app/download/mac
 
 # Framework package
-npm install https://github.com/Bbasche/verbum-ai/releases/latest/download/verbum-ai-0.1.0.tgz`}</pre>
+npm install verbum-ai`}</pre>
           </article>
 
           <article className="doc-block">

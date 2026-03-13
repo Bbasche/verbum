@@ -283,11 +283,10 @@ export class BridgeManager extends EventEmitter<{
       throw new Error("npm is not installed on this machine.");
     }
 
-    const packageAssetUrl = `https://github.com/Bbasche/verbum-ai/releases/download/v${this.version}/verbum-ai-${this.version}.tgz`;
-    const output = await spawnToString(npmBinary, ["install", "-g", packageAssetUrl], this.workspaceRoot);
+    const output = await spawnToString(npmBinary, ["install", "-g", "verbum-ai"], this.workspaceRoot);
     this.pushBusEvent("Installed verbum-ai globally");
     this.emitSnapshot();
-    return output || `Installed verbum-ai globally from ${packageAssetUrl}.`;
+    return output || "Installed verbum-ai globally.";
   }
 
   async installHelperService(): Promise<string> {
