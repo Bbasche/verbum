@@ -1,0 +1,54 @@
+{
+  "name": "verbum",
+  "version": "0.1.0",
+  "description": "Everything is a conversation. A TypeScript framework for routing messages between models, terminals, tools, memory, and humans.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "homepage": "https://verbum.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/verbum-ai/verbum.git"
+  },
+  "bugs": {
+    "url": "https://github.com/verbum-ai/verbum/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "keywords": [
+    "agents",
+    "ai",
+    "framework",
+    "llm",
+    "messages",
+    "orchestration",
+    "typescript"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^24.6.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  }
+}

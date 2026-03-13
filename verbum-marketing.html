@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Verbum — Everything is a conversation.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=JetBrains+Mono:wght@300;400;500&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d0d0d;--paper:#f5f0e8;--cream:#ede8db;
+  --accent:#c84b2f;--gold:#b8972a;--muted:#6b6355;--rule:#d4cfc4;
+  --code-bg:#1a1714;--code-text:#e8e0d0;--code-dim:#7a7060;
+  --code-kw:#e07a3a;--code-str:#8ab87a;--code-type:#7aabe0;
+  --dark:#0a0908;--dark-s:#131110;--dark-b:#2a2520;
+  --dark-t:#e8e0d0;--dark-m:#6a6055;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Libre Baskerville',Georgia,serif;background:var(--paper);color:var(--ink);font-size:17px;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:1000;opacity:.4}
+h1,h2,h3{font-family:'Playfair Display',Georgia,serif;font-weight:700;line-height:1.15;letter-spacing:-.02em}
+code,pre,.mono{font-family:'JetBrains Mono',monospace;font-size:.875em}
+.container{max-width:860px;margin:0 auto;padding:0 2rem}
+.wide{max-width:1100px;margin:0 auto;padding:0 2rem}
+
+/* HEADER */
+header{border-bottom:1px solid var(--rule);padding:1.5rem 0;position:sticky;top:0;background:var(--paper);z-index:100}
+.hinner{display:flex;align-items:center;justify-content:space-between;max-width:1100px;margin:0 auto;padding:0 2rem}
+.wordmark{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;letter-spacing:-.03em;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:.5rem}
+.wdot{width:7px;height:7px;background:var(--accent);border-radius:50%;display:inline-block;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.8)}}
+nav{display:flex;gap:2rem;align-items:center}
+nav a{font-family:'JetBrains Mono',monospace;font-size:.78rem;color:var(--muted);text-decoration:none;letter-spacing:.05em;text-transform:uppercase;transition:color .2s}
+nav a:hover{color:var(--ink)}
+.ncta{background:var(--ink)!important;color:var(--paper)!important;padding:.5rem 1.25rem;border-radius:2px;transition:background .2s!important}
+.ncta:hover{background:var(--accent)!important}
+
+/* HERO */
+.hero{padding:7rem 0 0;position:relative;overflow:hidden}
+.hero::before{content:'VERBUM';position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);font-family:'Playfair Display',serif;font-size:clamp(8rem,22vw,22rem);font-weight:900;color:transparent;-webkit-text-stroke:1px var(--rule);letter-spacing:-.05em;white-space:nowrap;pointer-events:none;user-select:none}
+.hero .container{position:relative;z-index:1}
+.hlabel{font-family:'JetBrains Mono',monospace;font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:.75rem;margin-bottom:2rem;opacity:0;animation:up .6s ease .1s forwards}
+.hlabel::before{content:'';display:block;width:32px;height:1px;background:var(--accent)}
+.hero h1{font-size:clamp(3rem,7vw,5.5rem);font-weight:900;font-style:italic;opacity:0;animation:up .7s ease .2s forwards}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hsub{font-size:1.2rem;color:var(--muted);max-width:580px;margin:1.5rem 0 3rem;line-height:1.65;opacity:0;animation:up .7s ease .35s forwards}
+.hact{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;opacity:0;animation:up .7s ease .45s forwards}
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.btnp{background:var(--ink);color:var(--paper);font-family:'JetBrains Mono',monospace;font-size:.875rem;padding:.85rem 2rem;text-decoration:none;border-radius:2px;letter-spacing:.03em;display:inline-flex;align-items:center;gap:.5rem;transition:background .2s,transform .15s}
+.btnp:hover{background:var(--accent);transform:translateY(-1px)}
+.btns{font-family:'JetBrains Mono',monospace;font-size:.875rem;color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 0;border-bottom:1px solid var(--rule);transition:color .2s,border-color .2s}
+.btns:hover{color:var(--ink);border-color:var(--ink)}
+.istrip{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:1.25rem 0;background:var(--cream);opacity:0;animation:up .7s ease .55s forwards}
+.istrip .wide{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap}
+.icmd{font-family:'JetBrains Mono',monospace;font-size:.9rem;display:flex;align-items:center;gap:.75rem;flex:1}
+.icmd .p{color:var(--muted)}.icmd .c{color:var(--ink);font-weight:500}
+.ibadges{display:flex;gap:1rem}
+.badge{font-family:'JetBrains Mono',monospace;font-size:.7rem;padding:.3rem .75rem;border:1px solid var(--rule);border-radius:2px;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.badge.g{border-color:#6a9a5a;color:#6a9a5a}.badge.b{border-color:#5a7a9a;color:#5a7a9a}
+
+/* SHARED */
+section{padding:6rem 0}
+.slabel{font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:.75rem}
+.slabel::before{content:'§';color:var(--accent);font-size:1rem}
+
+/* HOOK */
+.hook{background:var(--ink);color:var(--paper);padding:7rem 0}
+.hook .bar{width:40px;height:2px;background:var(--accent);margin-bottom:2.5rem}
+.hook h2{font-size:clamp(2rem,4vw,3rem);color:var(--paper);margin-bottom:2rem}
+.hook p{font-size:1.1rem;line-height:1.8;color:#b8b0a0;max-width:700px;margin-bottom:1.5rem}
+.hook p strong{color:var(--paper)}
+.hook blockquote{font-family:'Playfair Display',serif;font-size:1.45rem;font-style:italic;color:var(--paper);border-left:3px solid var(--accent);padding-left:1.5rem;margin:3rem 0;line-height:1.5}
+
+/* ACTORS */
+.agrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5px;background:var(--rule);border:1px solid var(--rule);margin-top:3rem;overflow:hidden}
+.acard{background:var(--paper);padding:2rem;transition:background .2s}
+.acard:hover{background:var(--cream)}
+.aicon{font-family:'JetBrains Mono',monospace;font-size:1.4rem;margin-bottom:1rem;display:block}
+.acard h3{font-size:1.05rem;margin-bottom:.4rem}
+.acard p{font-size:.88rem;color:var(--muted);line-height:1.6;margin-bottom:.75rem}
+.atags{list-style:none}
+.atags li{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--muted);padding:.2rem 0;border-bottom:1px dotted var(--rule);display:flex;align-items:center;gap:.4rem}
+.atags li::before{content:'→';color:var(--accent)}
+.atags li:last-child{border-bottom:none}
+.anew{font-family:'JetBrains Mono',monospace;font-size:.6rem;padding:.15rem .4rem;border:1px solid var(--gold);color:var(--gold);border-radius:2px;margin-left:.4rem;letter-spacing:.06em;text-transform:uppercase}
+
+/* CODE */
+.codesec{background:var(--cream)}
+.cpanel{margin-top:3rem;border:1px solid var(--rule);overflow:hidden}
+.cbar{background:var(--cream);border-bottom:1px solid var(--rule);padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.ctitle{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.dots{display:flex;gap:6px}
+.dr{width:10px;height:10px;border-radius:50%;background:#e06060}
+.dy{width:10px;height:10px;border-radius:50%;background:#e0c060}
+.dg{width:10px;height:10px;border-radius:50%;background:#60a060}
+pre.vcode{background:var(--code-bg);color:var(--code-text);padding:2.5rem;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.75;margin:0;tab-size:2}
+.ck{color:var(--code-kw)}.cs{color:var(--code-str)}.ct{color:var(--code-type)}.cd{color:var(--code-dim);font-style:italic}
+
+/* WHY */
+.wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:3rem;margin-top:3rem}
+.witem{border-top:2px solid var(--rule);padding-top:1.5rem;transition:border-color .2s}
+.witem:hover{border-color:var(--accent)}
+.wnum{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.1em;margin-bottom:.6rem}
+.witem h3{font-size:1.15rem;margin-bottom:.6rem}
+.witem p{font-size:.93rem;color:var(--muted);line-height:1.7}
+
+/* FEDERATION */
+.fed{background:var(--ink);padding:7rem 0}
+.fed .slabel{color:#444}
+.fed h2{color:var(--dark-t);font-size:clamp(2rem,4vw,3rem);margin-bottom:.75rem}
+.fed .lead{font-size:1.1rem;color:#a0988a;max-width:660px;margin-bottom:3.5rem;line-height:1.8}
+.fed .lead strong{color:var(--dark-t)}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:#1e1e1e;border:1px solid #1e1e1e;margin-bottom:3rem}
+.tcard{background:#0f0e0d;padding:1.5rem}
+.tname{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--accent);margin-bottom:.4rem;letter-spacing:.04em}
+.tdesc{font-size:.85rem;color:#777;line-height:1.6;margin-bottom:.75rem}
+.ttag{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:.2rem .5rem;border:1px solid #333;color:#555;width:fit-content;letter-spacing:.06em;text-transform:uppercase;border-radius:2px}
+.ttag.p2p{border-color:#3a2a5a;color:#7a5a9a}
+.ttag.srv{border-color:#2a3a2a;color:#5a8a5a}
+.fed-wrap{border:1px solid #1e1e1e;overflow:hidden}
+.fed-bar{background:#0a0908;border-bottom:1px solid #1e1e1e;padding:.75rem 1.5rem;display:flex;align-items:center;justify-content:space-between}
+.fed-btitle{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#444;letter-spacing:.1em;text-transform:uppercase}
+
+/* APP */
+.appsec{background:var(--dark);padding:7rem 0;position:relative;overflow:hidden}
+.appsec::before{content:'';position:absolute;inset:0;background-image:radial-gradient(1px 1px at 8% 18%,rgba(255,255,255,.12) 0%,transparent 100%),radial-gradient(1px 1px at 23% 72%,rgba(255,255,255,.08) 0%,transparent 100%),radial-gradient(1px 1px at 42% 12%,rgba(255,255,255,.1) 0%,transparent 100%),radial-gradient(1px 1px at 58% 88%,rgba(255,255,255,.07) 0%,transparent 100%),radial-gradient(1px 1px at 73% 33%,rgba(255,255,255,.12) 0%,transparent 100%),radial-gradient(1px 1px at 87% 58%,rgba(255,255,255,.09) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 62% 45%,rgba(200,132,47,.18) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 31% 38%,rgba(47,138,200,.12) 0%,transparent 100%);pointer-events:none}
+.appsec .slabel{color:#444}
+.appsec h2{color:var(--dark-t);font-size:clamp(2rem,4vw,3.25rem);margin-bottom:.75rem}
+.appsec .lead{font-size:1.1rem;color:var(--dark-m);max-width:640px;margin-bottom:3.5rem;line-height:1.8}
+.appsec .lead strong{color:var(--dark-t)}
+.gmock{background:var(--dark-s);border:1px solid var(--dark-b);border-radius:6px;overflow:hidden;margin-bottom:3.5rem}
+.gmock-bar{background:#0c0b0a;border-bottom:1px solid var(--dark-b);padding:.75rem 1.25rem;display:flex;align-items:center;gap:1rem}
+.gm-dots{display:flex;gap:6px}
+.gmd{width:10px;height:10px;border-radius:50%}
+.gmd.r{background:#3a1a1a}.gmd.y{background:#3a2a10}.gmd.g{background:#1a2a1a}
+.gm-title{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:#333;letter-spacing:.08em;flex:1;text-align:center}
+.gm-live{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:.2rem .6rem;border:1px solid var(--accent);border-radius:10px;color:var(--accent);letter-spacing:.06em}
+.gcanvas{width:100%;height:380px}
+.afgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1px;background:var(--dark-b);border:1px solid var(--dark-b);margin-bottom:3rem}
+.afcard{background:var(--dark-s);padding:2rem;transition:background .2s}
+.afcard:hover{background:#171614}
+.aficon{font-size:1.4rem;margin-bottom:.9rem;display:block}
+.afcard h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--dark-t);margin-bottom:.4rem}
+.afcard p{font-size:.87rem;color:var(--dark-m);line-height:1.65}
+.igrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1px;background:var(--dark-b);border:1px solid var(--dark-b)}
+.icard{background:var(--dark-s);padding:1.5rem}
+.iname{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--dark-t);margin-bottom:.35rem;letter-spacing:.04em}
+.idesc{font-size:.82rem;color:var(--dark-m);line-height:1.6;margin-bottom:.75rem}
+.imode{font-family:'JetBrains Mono',monospace;font-size:.62rem;padding:.2rem .5rem;border:1px solid;width:fit-content;letter-spacing:.06em;text-transform:uppercase;border-radius:2px}
+.imode.n{border-color:#3a5a2a;color:#6a8a5a}
+.imode.s{border-color:#5a3a2a;color:#8a5a3a}
+.imode.sub{border-color:#2a3a4a;color:#4a6a8a}
+.imode.p{border-color:#3a3a3a;color:#6a6a6a}
+.imode.ws{border-color:#4a2a5a;color:#7a5a8a}
+
+/* COMPARE */
+.cmp{background:var(--ink);padding:7rem 0}
+.cmp h2{color:var(--paper);margin-bottom:2.5rem;font-size:clamp(1.8rem,3.5vw,2.75rem)}
+table.ct{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.8rem}
+table.ct th{text-align:left;padding:.75rem 1rem;border-bottom:1px solid #333;color:#888;font-weight:400;letter-spacing:.08em;text-transform:uppercase;font-size:.7rem}
+table.ct th.vc{color:var(--accent)}
+table.ct td{padding:.9rem 1rem;border-bottom:1px solid #1a1a1a;color:#bbb;vertical-align:middle}
+table.ct td:first-child{color:var(--paper)}
+table.ct td.vc{color:var(--paper)}
+table.ct tr:last-child td{border-bottom:none}
+.ok{color:#6aaa5a}.no{color:#555}.half{color:#997733}
+
+/* CTA */
+.cta{padding:8rem 0;text-align:center;border-top:1px solid var(--rule)}
+.cta .slabel{justify-content:center}
+.cta h2{font-size:clamp(2.5rem,5vw,4rem);font-style:italic;margin:1rem 0 1.5rem}
+.cta p{font-size:1.05rem;color:var(--muted);max-width:480px;margin:0 auto 3rem;line-height:1.7}
+.ctarow{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap}
+
+/* FOOTER */
+footer{border-top:1px solid var(--rule);padding:3rem 0}
+.finner{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;max-width:1100px;margin:0 auto;padding:0 2rem}
+.flinks{display:flex;gap:1.5rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.08em}
+.flinks a{color:var(--muted);text-decoration:none;transition:color .2s}
+.flinks a:hover{color:var(--ink)}
+.fmit{font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .7s ease,transform .7s ease}
+.rv.on{opacity:1;transform:translateY(0)}
+@media(max-width:680px){nav{display:none}.ibadges{display:none}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hinner">
+    <a href="#" class="wordmark">Verbum<span class="wdot"></span></a>
+    <nav>
+      <a href="#why">Why</a>
+      <a href="#actors">Actors</a>
+      <a href="#network">Network</a>
+      <a href="#app">App</a>
+      <a href="https://github.com/verbum-ai/verbum" class="ncta">GitHub →</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <p class="hlabel">Open source · MIT · TypeScript</p>
+    <h1>Everything is a<br/><em>conversation.</em></h1>
+    <p class="hsub">Verbum gives every participant in your system — AI models, terminals, MCP servers, APIs, humans — a seat at the table. They send messages. They receive messages. The rest is routing.</p>
+    <div class="hact">
+      <a href="#docs" class="btnp">Get started →</a>
+      <a href="https://github.com/verbum-ai/verbum" class="btns">⭐ Star on GitHub</a>
+    </div>
+  </div>
+  <div class="istrip" style="margin-top:3rem">
+    <div class="wide">
+      <div class="icmd"><span class="p">$</span><span class="c">npm install verbum</span></div>
+      <div class="ibadges">
+        <span class="badge g">MIT</span><span class="badge b">TypeScript</span><span class="badge">Node 20+</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOOK -->
+<section class="hook" id="why">
+  <div class="container">
+    <div class="bar"></div>
+    <h2>The right abstraction<br/>changes everything downstream.</h2>
+    <p>Most frameworks model agent systems as function calls that happen to use language. You invoke tools. You query models. You stitch results together. It works — until you need to observe it, debug it, replay it, or hand control to a human.</p>
+    <p>Verbum starts from a different premise. <strong>Every participant is an Actor. Every interaction is a Message.</strong> Your terminal isn't a "tool" — it's in the conversation. Your MCP server isn't a plugin — it's a participant. Your human isn't a callback — they're first-class.</p>
+    <blockquote>"What if every part of your system could talk to every other part — in a language you could actually read?"</blockquote>
+    <p>The result: a system that is <strong>observable by construction</strong>, replayable by design, and composable without ceremony.</p>
+  </div>
+</section>
+
+<!-- ACTORS -->
+<section id="actors">
+  <div class="wide">
+    <div class="slabel">The Primitives</div>
+    <h2 style="font-size:clamp(1.75rem,3vw,2.5rem);max-width:560px">Seven actor types.<br/>One universal interface.</h2>
+    <div class="agrid rv">
+      <div class="acard">
+        <span class="aicon">⬡</span>
+        <h3>ModelActor</h3>
+        <p>Any LLM, wrapped uniformly. One line to swap providers.</p>
+        <ul class="atags">
+          <li>Claude (Anthropic)</li><li>GPT-4o / o3 (OpenAI)</li><li>Gemini (Google)</li><li>Ollama (local)</li><li>OpenRouter</li>
+        </ul>
+      </div>
+      <div class="acard">
+        <span class="aicon">▸</span>
+        <h3>ProcessActor</h3>
+        <p>A persistent shell session as a first-class participant. Any CLI, any subprocess, any REPL.</p>
+        <ul class="atags">
+          <li>bash / zsh / fish</li><li>Python / Node REPL</li><li>Any binary CLI</li><li>Docker exec</li>
+        </ul>
+      </div>
+      <div class="acard">
+        <span class="aicon">⊛</span>
+        <h3>MCPActor <span class="anew">New</span></h3>
+        <p>Speaks the Model Context Protocol natively. Auto-discovers tools from any MCP server on connect.</p>
+        <ul class="atags">
+          <li>stdio servers</li><li>SSE servers</li><li>Auto capability registry</li><li>Claude Code compatible</li>
+        </ul>
+      </div>
+      <div class="acard">
+        <span class="aicon">◎</span>
+        <h3>ToolActor</h3>
+        <p>Deterministic functions and API wrappers. Tools that can also <em>initiate</em> conversations.</p>
+        <ul class="atags">
+          <li>REST / GraphQL APIs</li><li>Pure functions</li><li>Webhooks</li>
+        </ul>
+      </div>
+      <div class="acard">
+        <span class="aicon">◉</span>
+        <h3>HumanActor</h3>
+        <p>A human is just another actor. Pause any flow, inject a response, resume — native to the model.</p>
+        <ul class="atags">
+          <li>stdin / CLI</li><li>WebSocket</li><li>Slack / Webhook</li><li>Nostr (Phase 4)</li>
+        </ul>
+      </div>
+      <div class="acard">
+        <span class="aicon">◫</span>
+        <h3>MemoryActor</h3>
+        <p>Persistent context that participates in conversation. Ask it anything — it responds like an actor.</p>
+        <ul class="atags">
+          <li>In-memory</li><li>SQLite</li><li>Qdrant (vector)</li><li>File (JSONL)</li>
+        </ul>
+      </div>
+      <div class="acard">
+        <span class="aicon">⟡</span>
+        <h3>RemoteActor <span class="anew">Phase 4</span></h3>
+        <p>An actor on another machine. From the Router's perspective — indistinguishable from local.</p>
+        <ul class="atags">
+          <li>Nostr (p2p)</li><li>WebSocket</li><li>NATS</li><li>HTTP</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CODE -->
+<section class="codesec">
+  <div class="container">
+    <div class="slabel">Show me the code</div>
+    <h2 style="font-size:clamp(1.75rem,3vw,2.5rem)">Same API. Every actor.</h2>
+    <div class="cpanel rv">
+      <div class="cbar">
+        <div class="dots"><div class="dr"></div><div class="dy"></div><div class="dg"></div></div>
+        <span class="ctitle">agent.ts</span><span></span>
+      </div>
+<pre class="vcode"><span class="ck">import</span> { Router, ModelActor, ProcessActor, MCPActor, MemoryActor } <span class="ck">from</span> <span class="cs">'verbum'</span>
+
+<span class="ck">const</span> router = <span class="ck">new</span> <span class="ct">Router</span>()
+
+<span class="cd">// Every participant — same interface, same message format</span>
+router.register(<span class="ck">new</span> <span class="ct">ModelActor</span>({ id: <span class="cs">'claude'</span>, provider: <span class="cs">'anthropic'</span> }))
+router.register(<span class="ck">new</span> <span class="ct">ProcessActor</span>({ id: <span class="cs">'shell'</span>, shell: <span class="cs">'/bin/bash'</span> }))
+router.register(<span class="ck">new</span> <span class="ct">MCPActor</span>({
+  id: <span class="cs">'filesystem'</span>, transport: <span class="cs">'stdio'</span>,
+  command: <span class="cs">'npx'</span>, args: [<span class="cs">'-y'</span>, <span class="cs">'@modelcontextprotocol/server-filesystem'</span>, <span class="cs">'.'</span>],
+}))
+router.register(<span class="ck">new</span> <span class="ct">MemoryActor</span>({ id: <span class="cs">'memory'</span>, backend: <span class="cs">'sqlite'</span> }))
+
+<span class="cd">// Send once. Claude routes to shell, MCP, and memory — automatically.</span>
+<span class="ck">await</span> router.send({
+  from: <span class="cs">'user'</span>, to: <span class="cs">'claude'</span>, role: <span class="cs">'user'</span>,
+  content: { type: <span class="cs">'text'</span>, text: <span class="cs">'Find the largest file, summarise it, save the summary'</span> },
+  conversationId: <span class="cs">'run-001'</span>,
+})
+
+<span class="cd">// Every message recorded. Every edge in the graph. Fully replayable.</span>
+<span class="ck">const</span> graph = router.visualize()
+graph.toMermaid()     <span class="cd">// → diagram string</span>
+graph.replay()        <span class="cd">// → AsyncIterable&lt;Message&gt;</span>
+graph.fork(<span class="cs">'msg-12'</span>) <span class="cd">// → branch from any point</span></pre>
+    </div>
+  </div>
+</section>
+
+<!-- WHY IT MATTERS -->
+<section>
+  <div class="container">
+    <div class="slabel">Why it matters</div>
+    <h2 style="font-size:clamp(1.75rem,3vw,2.5rem)">Four things you get for free<br/>from the right abstraction.</h2>
+    <div class="wgrid rv">
+      <div class="witem">
+        <div class="wnum">01</div>
+        <h3>Observable by construction</h3>
+        <p>Every interaction — model to shell, agent to MCP server, human to model — is a structured, readable Message. Not a log line. Not a trace ID. The entire run is a conversation you can open and read.</p>
+      </div>
+      <div class="witem">
+        <div class="wnum">02</div>
+        <h3>Replayable. Forkable. Diffable.</h3>
+        <p>Every run serialises as a conversation graph. Replay at any speed. Fork from any message — explore what would have happened if the model had responded differently. Debug with time travel.</p>
+      </div>
+      <div class="witem">
+        <div class="wnum">03</div>
+        <h3>Portable context</h3>
+        <p>Move a conversation between providers mid-flight. Start with Claude, hand off to a local model, resume with GPT. The context belongs to no one — it's just a Message history.</p>
+      </div>
+      <div class="witem">
+        <div class="wnum">04</div>
+        <h3>Composable without ceremony</h3>
+        <p>An agent that uses a shell, an MCP server, and a memory store is three registered actors and a routing rule. No pipelines to wire. No abstractions to fight.</p>
+      </div>
+      <div class="witem">
+        <div class="wnum">05</div>
+        <h3>Humans are first-class</h3>
+        <p>Human-in-the-loop is native. Pause any flow mid-conversation, route a message to a HumanActor, resume when they respond. The graph spans both.</p>
+      </div>
+      <div class="witem">
+        <div class="wnum">06</div>
+        <h3>The full MCP ecosystem</h3>
+        <p>MCPActor speaks the Model Context Protocol natively. Any MCP server — filesystem, browser, database — is an actor. If it works with Claude Code, it works with Verbum.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEDERATION -->
+<section class="fed" id="network">
+  <div class="wide">
+    <div class="slabel">Phase 4 · Federated Mesh</div>
+    <h2>Conversations that span<br/>machines — without a server.</h2>
+    <p class="lead"><strong>RemoteActor</strong> makes a participant on another machine indistinguishable from a local one. Route a message to <code style="font-size:.85em;color:#c8842f;font-family:'JetBrains Mono',monospace">gemini@npub1abc...</code> and the framework delivers it — signed, optionally encrypted, over your transport of choice.</p>
+    <div class="tgrid rv">
+      <div class="tcard">
+        <div class="tname">NostrTransport</div>
+        <div class="tdesc">Signed messages over Nostr relays. No server required. Humans with any Nostr client participate natively.</div>
+        <div class="ttag p2p">p2p · no server</div>
+      </div>
+      <div class="tcard">
+        <div class="tname">WebSocketTransport</div>
+        <div class="tdesc">Direct node-to-node. Best for LAN or same-org deployments where you control both ends.</div>
+        <div class="ttag srv">direct · low latency</div>
+      </div>
+      <div class="tcard">
+        <div class="tname">NATSTransport</div>
+        <div class="tdesc">For teams running their own messaging infrastructure. High-throughput, durable, multi-subscriber.</div>
+        <div class="ttag srv">self-hosted · durable</div>
+      </div>
+      <div class="tcard">
+        <div class="tname">HTTPTransport</div>
+        <div class="tdesc">Webhook-style. Any HTTP endpoint becomes a reachable Verbum actor. Dead simple.</div>
+        <div class="ttag srv">universal · stateless</div>
+      </div>
+    </div>
+    <div class="fed-wrap rv">
+      <div class="fed-bar">
+        <div class="dots"><div class="dr"></div><div class="dy"></div><div class="dg"></div></div>
+        <span class="fed-btitle">federation.ts</span><span></span>
+      </div>
+<pre class="vcode"><span class="ck">import</span> { Router, ModelActor } <span class="ck">from</span> <span class="cs">'verbum'</span>
+<span class="ck">import</span> { RemoteActor, NostrTransport } <span class="ck">from</span> <span class="cs">'@verbum/network'</span>
+
+<span class="ck">const</span> router = <span class="ck">new</span> <span class="ct">Router</span>()
+router.register(<span class="ck">new</span> <span class="ct">ModelActor</span>({ id: <span class="cs">'claude'</span>, provider: <span class="cs">'anthropic'</span> }))
+
+<span class="cd">// A Gemini instance on another machine — same API as local</span>
+router.register(<span class="ck">new</span> <span class="ct">RemoteActor</span>({
+  id: <span class="cs">'remote-gemini'</span>,
+  address: <span class="cs">'gemini@npub1xyz...'</span>,
+  transport: <span class="ck">new</span> <span class="ct">NostrTransport</span>({ relays: [<span class="cs">'wss://relay.damus.io'</span>] }),
+}))
+
+<span class="cd">// Route locally or across the mesh — identically</span>
+<span class="ck">await</span> router.send({ from: <span class="cs">'user'</span>, to: <span class="cs">'remote-gemini'</span>, content: { type: <span class="cs">'text'</span>, text: <span class="cs">'...'</span> } })</pre>
+    </div>
+  </div>
+</section>
+
+<!-- APP -->
+<section class="appsec" id="app">
+  <div class="wide" style="position:relative;z-index:1">
+    <div class="slabel">Verbum App · macOS</div>
+    <h2>The god-view of every<br/>conversation your system is having.</h2>
+    <p class="lead">A native Mac app that ingests streams from <strong>Verbum agents, Claude Code, Codex CLI, terminals, and any chat frontend</strong> — and renders them as a unified, live 3D conversation graph. Observe. Inspect. Replay. Chat.</p>
+
+    <!-- graph mock SVG -->
+    <div class="gmock rv">
+      <div class="gmock-bar">
+        <div class="gm-dots"><div class="gmd r"></div><div class="gmd y"></div><div class="gmd g"></div></div>
+        <span class="gm-title">Verbum App — Conversation Graph</span>
+        <span class="gm-live">● live</span>
+      </div>
+      <div class="gcanvas">
+        <svg viewBox="0 0 900 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">
+          <defs>
+            <radialGradient id="ha" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#c8842f" stop-opacity="0.22"/><stop offset="100%" stop-color="#c8842f" stop-opacity="0"/></radialGradient>
+            <radialGradient id="hb" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#2f8ac8" stop-opacity="0.18"/><stop offset="100%" stop-color="#2f8ac8" stop-opacity="0"/></radialGradient>
+            <radialGradient id="hc" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#6a8a5a" stop-opacity="0.18"/><stop offset="100%" stop-color="#6a8a5a" stop-opacity="0"/></radialGradient>
+            <radialGradient id="hd" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#b8972a" stop-opacity="0.18"/><stop offset="100%" stop-color="#b8972a" stop-opacity="0"/></radialGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="2.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <!-- halos -->
+          <ellipse cx="310" cy="175" rx="52" ry="52" fill="url(#ha)"/>
+          <ellipse cx="560" cy="115" rx="42" ry="42" fill="url(#hb)"/>
+          <ellipse cx="570" cy="255" rx="38" ry="38" fill="url(#hc)"/>
+          <ellipse cx="155" cy="275" rx="38" ry="38" fill="url(#hd)"/>
+          <ellipse cx="750" cy="195" rx="32" ry="32" fill="url(#ha)" opacity="0.45"/>
+          <!-- edges -->
+          <g fill="none" opacity="0.5">
+            <path d="M310,175 Q430,80 560,115" stroke="#c8842f" stroke-width="1" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.2s" repeatCount="indefinite"/></path>
+            <path d="M310,175 Q440,235 570,255" stroke="#c8842f" stroke-width="1" stroke-dasharray="4,3"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.7s" repeatCount="indefinite"/></path>
+            <path d="M155,275 Q232,225 310,175" stroke="#b8972a" stroke-width="1" stroke-dasharray="3,4" opacity="0.45"><animate attributeName="stroke-dashoffset" from="0" to="28" dur="2s" repeatCount="indefinite"/></path>
+            <path d="M560,115 Q655,150 750,195" stroke="#2f8ac8" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="1.9s" repeatCount="indefinite"/></path>
+            <path d="M570,255 Q660,235 750,195" stroke="#6a8a5a" stroke-width="1" stroke-dasharray="4,3" opacity="0.4"><animate attributeName="stroke-dashoffset" from="0" to="-28" dur="2.3s" repeatCount="indefinite"/></path>
+            <path d="M310,175 Q200,138 98,98" stroke="#c84b2f" stroke-width="0.8" stroke-dasharray="3,5" opacity="0.2"><animate attributeName="stroke-dashoffset" from="0" to="28" dur="2.6s" repeatCount="indefinite"/></path>
+          </g>
+          <!-- HumanActor -->
+          <g transform="translate(310,175)" filter="url(#glow)">
+            <circle r="21" fill="#0f0e0d" stroke="#e8e0d0" stroke-width="1.5"/>
+            <circle r="15" fill="none" stroke="#e8e0d0" stroke-width="0.5" opacity="0.35"/>
+            <text y="1" text-anchor="middle" dominant-baseline="middle" fill="#e8e0d0" font-size="9.5" font-family="JetBrains Mono,monospace">you</text>
+          </g>
+          <!-- ModelActor claude -->
+          <g transform="translate(560,115)" filter="url(#glow)">
+            <polygon points="0,-19 16.5,9.5 -16.5,9.5" fill="#0f0e0d" stroke="#c8842f" stroke-width="1.5"/>
+            <text y="23" text-anchor="middle" fill="#c8842f" font-size="8.5" font-family="JetBrains Mono,monospace">claude</text>
+          </g>
+          <!-- MCPActor -->
+          <g transform="translate(570,255)">
+            <rect x="-19" y="-13" width="38" height="26" fill="#0f0e0d" stroke="#6a8a5a" stroke-width="1.5" rx="2"/>
+            <text y="1" text-anchor="middle" dominant-baseline="middle" fill="#6a8a5a" font-size="7.5" font-family="JetBrains Mono,monospace">mcp-fs</text>
+            <text y="26" text-anchor="middle" fill="#6a8a5a" font-size="7.5" font-family="JetBrains Mono,monospace" opacity="0.6">MCPActor</text>
+          </g>
+          <!-- MemoryActor -->
+          <g transform="translate(155,275)">
+            <ellipse rx="21" ry="11" fill="#0f0e0d" stroke="#b8972a" stroke-width="1.5"/>
+            <ellipse rx="21" ry="11" cy="-5" fill="#0f0e0d" stroke="#b8972a" stroke-width="0.8" opacity="0.4"/>
+            <text y="25" text-anchor="middle" fill="#b8972a" font-size="8" font-family="JetBrains Mono,monospace">memory</text>
+          </g>
+          <!-- ProcessActor shell -->
+          <g transform="translate(750,195)">
+            <rect x="-18" y="-17" width="36" height="34" fill="#0f0e0d" stroke="#4a4a4a" stroke-width="1.5" rx="2"/>
+            <text y="1" text-anchor="middle" dominant-baseline="middle" fill="#888" font-size="9" font-family="JetBrains Mono,monospace">shell</text>
+            <text y="25" text-anchor="middle" fill="#555" font-size="7.5" font-family="JetBrains Mono,monospace">Process</text>
+          </g>
+          <!-- RemoteActor ghost -->
+          <g transform="translate(98,98)" opacity="0.35">
+            <polygon points="0,-15 13,7.5 -13,7.5" fill="#0a0908" stroke="#7a5a9a" stroke-width="1" stroke-dasharray="2,2"/>
+            <text y="19" text-anchor="middle" fill="#7a5a9a" font-size="7.5" font-family="JetBrains Mono,monospace">remote</text>
+          </g>
+          <!-- legend -->
+          <g transform="translate(18,18)" font-family="JetBrains Mono,monospace" font-size="7.5">
+            <rect width="108" height="86" fill="#0a0908" fill-opacity="0.85" rx="3"/>
+            <circle cx="14" cy="15" r="6" fill="none" stroke="#e8e0d0" stroke-width="1"/>
+            <text x="26" y="18" fill="#777">HumanActor</text>
+            <polygon points="14,29 21,42 7,42" fill="none" stroke="#c8842f" stroke-width="1"/>
+            <text x="26" y="38" fill="#777">ModelActor</text>
+            <rect x="8" y="48" width="12" height="11" fill="none" stroke="#6a8a5a" stroke-width="1"/>
+            <text x="26" y="57" fill="#777">MCPActor</text>
+            <ellipse cx="14" cy="70" rx="7" ry="4" fill="none" stroke="#b8972a" stroke-width="1"/>
+            <text x="26" y="73" fill="#777">MemoryActor</text>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="afgrid rv">
+      <div class="afcard"><span class="aficon">✦</span><h3>Live 3D Graph</h3><p>Force-directed 3D graph on Three.js. Every actor a node, every message an animated edge. Watch your system think in real time.</p></div>
+      <div class="afcard"><span class="aficon">⏮</span><h3>Replay & Fork</h3><p>Scrub the timeline to any moment. Replay at any speed. Fork from any message to explore alternate histories.</p></div>
+      <div class="afcard"><span class="aficon">◈</span><h3>Unified Inbox</h3><p>All your human↔agent conversations in one place. Switch the backend actor mid-thread without losing context.</p></div>
+      <div class="afcard"><span class="aficon">▸</span><h3>Terminal Viewer</h3><p>Every terminal session rendered as a conversation stream. Jump directly to any session's node in the 3D graph.</p></div>
+      <div class="afcard"><span class="aficon">⊙</span><h3>Chat Bridge</h3><p>A local WebSocket server any chat UI can connect to. Bring your own frontend — Verbum App handles routing.</p></div>
+      <div class="afcard"><span class="aficon">⟡</span><h3>Native macOS</h3><p>Menu bar, Dock badge, Spotlight search, notifications. Native window management. Feels like it belongs.</p></div>
+    </div>
+
+    <div class="slabel" style="margin-bottom:1.25rem">Integrations</div>
+    <h3 style="font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--dark-t);margin-bottom:2rem">Works with everything you already use.</h3>
+    <div class="igrid rv">
+      <div class="icard"><div class="iname">Verbum Router</div><div class="idesc">Native IPC. Real-time message events streamed live to the graph.</div><div class="imode n">native IPC</div></div>
+      <div class="icard"><div class="iname">Claude Code</div><div class="idesc">Headless SDK integration. Full agentic loop visible — prompts, tool calls, file edits, shell commands, responses.</div><div class="imode s">headless SDK</div></div>
+      <div class="icard"><div class="iname">Claude Code TUI</div><div class="idesc">Session file watcher for users who run their own terminal. Observation without interference.</div><div class="imode p">passive watch</div></div>
+      <div class="icard"><div class="iname">Codex CLI</div><div class="idesc">Managed subprocess in full-auto mode. Structured stdout parsed to messages.</div><div class="imode sub">subprocess</div></div>
+      <div class="icard"><div class="iname">Any Chat UI</div><div class="idesc">Local WebSocket bridge. One connection and your frontend routes through Verbum App.</div><div class="imode ws">WebSocket</div></div>
+      <div class="icard"><div class="iname">Browser Extension</div><div class="idesc">Passively observes claude.ai, ChatGPT, others. Surfaces them in the graph alongside local sessions.</div><div class="imode p">passive</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARE -->
+<section class="cmp">
+  <div class="wide">
+    <div class="slabel" style="color:#444">At a glance</div>
+    <h2>Built around the right abstraction.</h2>
+    <table class="ct">
+      <thead><tr><th>Feature</th><th class="vc">Verbum</th><th>OpenClaw</th><th>LangChain</th><th>AutoGen</th></tr></thead>
+      <tbody>
+        <tr><td>Everything-is-a-message model</td><td class="vc ok">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+        <tr><td>Terminal as first-class Actor</td><td class="vc ok">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+        <tr><td>MCP servers as first-class Actor</td><td class="vc ok">✓</td><td class="half">partial</td><td class="half">partial</td><td class="no">✗</td></tr>
+        <tr><td>Human Actor (native pause / resume)</td><td class="vc ok">✓</td><td class="half">partial</td><td class="half">partial</td><td class="half">partial</td></tr>
+        <tr><td>Conversation graph + replay</td><td class="vc ok">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+        <tr><td>Portable context (swap model mid-run)</td><td class="vc ok">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+        <tr><td>Zero-config start</td><td class="vc ok">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+        <tr><td>TypeScript-native</td><td class="vc ok">✓</td><td class="ok">✓</td><td class="half">partial</td><td class="no">✗</td></tr>
+        <tr><td>Federated p2p mesh</td><td class="vc ok">✓ Phase 4</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+        <tr><td>Native macOS companion app</td><td class="vc ok">✓</td><td class="no">✗</td><td class="no">✗</td><td class="no">✗</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="container">
+    <div class="slabel">Get started</div>
+    <h2>Stop wiring.<br/>Start talking.</h2>
+    <p>MIT licensed. Built in public. No vendor lock-in. The framework and the app — both free.</p>
+    <div class="ctarow">
+      <a href="#docs" class="btnp">Read the docs →</a>
+      <a href="https://github.com/verbum-ai/verbum" class="btns">View on GitHub →</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="finner">
+    <a href="#" class="wordmark" style="font-size:1.1rem">Verbum<span class="wdot"></span></a>
+    <div class="flinks"><a href="#">Docs</a><a href="#">GitHub</a><a href="#">Discord</a><a href="#">npm</a></div>
+    <span class="fmit">MIT License · Built in public</span>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(es => es.forEach(e => {
+  if(e.isIntersecting){e.target.classList.add('on');obs.unobserve(e.target)}
+}),{threshold:0.08})
+document.querySelectorAll('.rv').forEach(el => obs.observe(el))
+</script>
+</body>
+</html>
