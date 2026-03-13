@@ -15,6 +15,7 @@
   "build": {
     "appId": "ai.basche42.verbum",
     "productName": "Verbum",
+    "icon": "build/icon.icns",
     "directories": {
       "output": "release"
     },
@@ -23,6 +24,7 @@
       "package.json"
     ],
     "mac": {
+      "icon": "build/icon.icns",
       "category": "public.app-category.developer-tools",
       "artifactName": "Verbum.dmg",
       "target": [

@@ -6,21 +6,19 @@ import {
   useState
 } from "react";
 
-import {
-  graphEdges,
-  graphNodes,
-  inboxThread,
-  onboardingSteps,
-  searchDocuments
-} from "./demo-data";
+import { graphEdges, graphNodes, inboxThread, searchDocuments } from "./demo-data";
 import { MessageRenderer } from "./MessageRenderer";
 import type { BridgeSnapshot, ConversationSummary, SourceDescriptor } from "./message-schema";
+import verbumLogoDark from "./assets/verbum-logo-dark.png";
+import verbumMacIcon from "./assets/verbum-mac-icon-1024.png";
 
 type SearchCitation = (typeof searchDocuments)[number];
+type DetailTab = "inspector" | "search";
 
 function scoreDocument(query: string, document: SearchCitation): number {
   const terms = query.toLowerCase().split(/\W+/).filter(Boolean);
-  const haystack = `${document.title} ${document.kind} ${document.tags.join(" ")} ${document.excerpt}`.toLowerCase();
+  const haystack =
+    `${document.title} ${document.kind} ${document.tags.join(" ")} ${document.excerpt}`.toLowerCase();
   return terms.reduce((total, term) => total + (haystack.includes(term) ? 2 : 0), 0);
 }
 
@@ -35,7 +33,7 @@ function answerQuery(query: string): { summary: string; citations: SearchCitatio
   if (citations.length === 0) {
     return {
       summary:
-        "Verbum App still centers the same answer: it is the native layer above Claude Code, Codex, and your terminals, with search and inbox stitched into the graph.",
+        "Verbum App keeps the machine readable: master conversation in focus, graph activity above it, and search on demand instead of everywhere at once.",
       citations: searchDocuments.slice(0, 2)
     };
   }
@@ -46,12 +44,22 @@ function answerQuery(query: string): { summary: string; citations: SearchCitatio
   };
 }
 
+function compactPath(path: string): string {
+  const parts = path.split("/").filter(Boolean);
+  return parts.slice(-2).join("/") || path;
+}
+
+function titleCase(value: string): string {
+  return value.replace(/-/g, " ").replace(/\b\w/g, (match) => match.toUpperCase());
+}
+
 export function App() {
   const [selectedId, setSelectedId] = useState("verbum-app");
   const [selectedConversationId, setSelectedConversationId] = useState("master");
-  const [query, setQuery] = useState("How does the app orchestrate Claude Code, Codex, and terminals?");
+  const [query, setQuery] = useState("How does Verbum orchestrate Claude Code, Codex, and terminals?");
   const [pulseIndex, setPulseIndex] = useState(0);
   const [routeTo, setRouteTo] = useState("claude-code");
+  const [detailTab, setDetailTab] = useState<DetailTab>("inspector");
   const [composerValue, setComposerValue] = useState(
     "Summarize the latest build result and route the fix to Claude Code."
   );
@@ -59,22 +67,60 @@ export function App() {
   const [searchTurns, setSearchTurns] = useState<
     Array<{ role: "assistant" | "user"; content: string; citations?: SearchCitation[] }>
   >(() => {
-    const answer = answerQuery("How does the app orchestrate Claude Code, Codex, and terminals?");
+    const answer = answerQuery("How does Verbum orchestrate Claude Code, Codex, and terminals?");
     return [{ role: "assistant", content: answer.summary, citations: answer.citations }];
   });
 
   const deferredQuery = useDeferredValue(query);
   const sources = snapshot?.sources ?? [];
   const conversations = snapshot?.conversations ?? [];
-  const feed = (snapshot?.messages ?? []).filter(
-    (message) => message.conversationId === selectedConversationId
-  );
-  const busEvents = snapshot?.busEvents ?? ["Verbum App is booting…"];
+  const allMessages = snapshot?.messages ?? [];
+  const busEvents = snapshot?.busEvents ?? ["Verbum App is booting..."];
   const terminals = snapshot?.terminals ?? [];
   const demoCommands = snapshot?.demoCommands ?? [];
-  const selectedNode = graphNodes.find((node) => node.id === selectedId) ?? graphNodes[0];
+  const selectedConversation =
+    conversations.find((conversation) => conversation.id === selectedConversationId) ?? conversations[0];
+  const feed = allMessages.filter((message) => message.conversationId === selectedConversationId);
+  const activeEdge = graphEdges[pulseIndex] ?? graphEdges[0];
+  const sourceById = new Map(sources.map((source) => [source.id, source]));
+  const terminalById = new Map(terminals.map((terminal) => [terminal.id, terminal]));
+  const messageCountBySource = new Map<string, number>();
+
+  for (const message of allMessages) {
+    messageCountBySource.set(message.sourceId, (messageCountBySource.get(message.sourceId) ?? 0) + 1);
+  }
+
+  const graphDescriptors = graphNodes.map((node) => {
+    const source = sourceById.get(node.id);
+    const terminal = terminalById.get(node.id);
+    const messageCount = messageCountBySource.get(node.id) ?? 0;
+    const inbound = graphEdges.filter((edge) => edge.to === node.id).length;
+    const outbound = graphEdges.filter((edge) => edge.from === node.id).length;
+    const connected = source ? source.connected : node.id === "verbum-app" || node.id === "search" || node.id === "inbox";
+    const status = source?.status ?? (terminal?.lastCommand ? "busy" : connected ? "ready" : "idle");
+    const accent = source?.mode ?? titleCase(node.type);
+    const summary = terminal?.lastCommand
+      ? `Last command: ${terminal.lastCommand}`
+      : source?.subtitle ?? node.detail;
+
+    return {
+      ...node,
+      source,
+      terminal,
+      connected,
+      status,
+      accent,
+      summary,
+      messageCount,
+      inbound,
+      outbound
+    };
+  });
+
+  const selectedDescriptor =
+    graphDescriptors.find((descriptor) => descriptor.id === selectedId) ?? graphDescriptors[0];
   const selectedSource =
-    sources.find((descriptor) => descriptor.id === selectedId) ??
+    selectedDescriptor?.source ??
     sources[0] ?? {
       id: "verbum-app",
       name: "Verbum App",
@@ -85,6 +131,25 @@ export function App() {
       typing: "graph, inbox, search, typed source registry",
       status: "starting"
     };
+  const relatedFlows = graphEdges.map((edge, index) => {
+    const traffic =
+      (messageCountBySource.get(edge.from) ?? 0) + (messageCountBySource.get(edge.to) ?? 0);
+    const from = graphNodes.find((node) => node.id === edge.from)?.label ?? edge.from;
+    const to = graphNodes.find((node) => node.id === edge.to)?.label ?? edge.to;
+
+    return {
+      ...edge,
+      fromLabel: from,
+      toLabel: to,
+      traffic,
+      active: index === pulseIndex,
+      related: edge.from === selectedId || edge.to === selectedId
+    };
+  });
+  const selectedNodeMessages = allMessages
+    .filter((message) => message.sourceId === selectedId)
+    .slice(-3)
+    .reverse();
   const liveMatches = [...searchDocuments]
     .map((document) => ({ document, score: scoreDocument(deferredQuery, document) }))
     .sort((left, right) => right.score - left.score)
@@ -135,16 +200,32 @@ export function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div>
+        <div className="title-stack">
+          <div className="brand-bar">
+            <img alt="Verbum icon" className="brand-mark" src={verbumMacIcon} />
+            <img alt="Verbum" className="brand-wordmark" src={verbumLogoDark} />
+          </div>
           <span className="eyebrow">Verbum App</span>
-          <h1>The god-view of every conversation on your machine.</h1>
+          <h1>Machine conversations, made legible.</h1>
+          <p>Master thread first. Graph above. Context on demand.</p>
         </div>
         <div className="topbar-metrics">
-          <span>macOS desktop app</span>
-          <span>{sources.length} sources</span>
-          <span>{conversations.length} conversations</span>
-          <span>{sources.filter((source) => source.connected).length} connected</span>
-          <span>{snapshot?.workspaceRoot ?? "loading workspace"}</span>
+          <article className="metric-card">
+            <span>Workspace</span>
+            <strong>{compactPath(snapshot?.workspaceRoot ?? "loading")}</strong>
+          </article>
+          <article className="metric-card">
+            <span>Connected</span>
+            <strong>{sources.filter((source) => source.connected).length}</strong>
+          </article>
+          <article className="metric-card">
+            <span>Active flow</span>
+            <strong>{activeEdge.label}</strong>
+          </article>
+          <article className="metric-card">
+            <span>Thread</span>
+            <strong>{selectedConversation?.title ?? "Master conversation"}</strong>
+          </article>
         </div>
       </header>
 
@@ -160,22 +241,13 @@ export function App() {
 
       <div className="workspace">
         <aside className="sidebar panel">
-          <div className="panel-head">
-            <span className="eyebrow">Start Here</span>
-            <p>Friendly enough for first-time users, typed enough for engineers to extend.</p>
-          </div>
-          <ol className="onboarding-list">
-            {onboardingSteps.map((step) => (
-              <li key={step}>{step}</li>
-            ))}
-          </ol>
           <div className="panel-head panel-head-inline">
             <div>
-              <span className="eyebrow">Conversations</span>
-              <p>Your main thread with Verbum is the master conversation. Spawn others when needed.</p>
+              <span className="eyebrow">Threads</span>
+              <p>Keep the master conversation in focus. Spawn side threads only when they earn it.</p>
             </div>
             <button
-              className="chip"
+              className="action-button"
               onClick={() => {
                 void window.verbumApp
                   .spawnConversation({ title: `Side thread ${conversations.length}` })
@@ -186,39 +258,69 @@ export function App() {
               New thread
             </button>
           </div>
+
           <div className="conversation-list">
-            {conversations.map((conversation: ConversationSummary) => (
-              <button
-                className={`session-card ${
-                  conversation.id === selectedConversationId ? "session-card-active" : ""
-                }`}
-                key={conversation.id}
-                onClick={() => setSelectedConversationId(conversation.id)}
-                type="button"
-              >
-                <strong>{conversation.title}</strong>
-                <span>{conversation.status}</span>
-                <p>Last activity {conversation.lastActivity}</p>
-              </button>
-            ))}
+            {conversations.map((conversation: ConversationSummary) => {
+              const messageCount = allMessages.filter(
+                (message) => message.conversationId === conversation.id
+              ).length;
+
+              return (
+                <button
+                  className={`session-card ${
+                    conversation.id === selectedConversationId ? "session-card-active" : ""
+                  }`}
+                  key={conversation.id}
+                  onClick={() => setSelectedConversationId(conversation.id)}
+                  type="button"
+                >
+                  <div className="session-card-row">
+                    <strong>{conversation.title}</strong>
+                    <span>{conversation.status}</span>
+                  </div>
+                  <p>{messageCount} messages in thread</p>
+                  <small>Last activity {conversation.lastActivity}</small>
+                </button>
+              );
+            })}
           </div>
+
+          <div className="sidebar-summary">
+            <div className="sidebar-stat">
+              <span>Route</span>
+              <strong>{sourceById.get(routeTo)?.name ?? routeTo}</strong>
+            </div>
+            <div className="sidebar-stat">
+              <span>Selected node</span>
+              <strong>{selectedDescriptor?.label ?? "Verbum App"}</strong>
+            </div>
+            <div className="sidebar-stat">
+              <span>Messages</span>
+              <strong>{feed.length} in view</strong>
+            </div>
+            <div className="sidebar-stat">
+              <span>Search docs</span>
+              <strong>{searchDocuments.length} indexed</strong>
+            </div>
+          </div>
+
           <div className="panel-head">
             <span className="eyebrow">Sources</span>
-            <p>Companion app today, replacement interface when you want it.</p>
+            <p>Compact status only. The graph is the detailed source view.</p>
           </div>
-          <div className="session-list">
+          <div className="source-palette">
             {sources.map((source: SourceDescriptor) => (
               <button
-                className={`session-card ${source.id === selectedId ? "session-card-active" : ""}`}
+                className={`source-pill ${source.id === selectedId ? "source-pill-active" : ""}`}
                 key={source.id}
-                onClick={() => setSelectedId(source.id)}
+                onClick={() => {
+                  setSelectedId(source.id);
+                  setRouteTo(source.id);
+                }}
                 type="button"
               >
-                <strong>{source.name}</strong>
-                <span>{source.mode}</span>
-                <p>{source.subtitle}</p>
-                <em>{source.status}</em>
-                <small>{source.typing}</small>
+                <span className={`status-dot ${source.connected ? "status-dot-online" : "status-dot-idle"}`}></span>
+                {source.name}
               </button>
             ))}
           </div>
@@ -229,12 +331,79 @@ export function App() {
             <div className="panel-head panel-head-inline">
               <div>
                 <span className="eyebrow">Conversation Graph</span>
-                <p>Claude Code, Codex, search, inbox, and terminals in one live constellation.</p>
+                <p>Dense enough to debug. Calm enough to understand at a glance.</p>
               </div>
-              <span className="status-pill">Active edge {pulseIndex + 1}</span>
+              <span className="status-pill">{relatedFlows.filter((flow) => flow.active).length} active path</span>
+            </div>
+
+            <div className="graph-summary-grid">
+              <article className="graph-summary-card">
+                <span>Selected</span>
+                <strong>{selectedDescriptor.label}</strong>
+                <p>{selectedDescriptor.messageCount} messages touching this node</p>
+              </article>
+              <article className="graph-summary-card">
+                <span>Current flow</span>
+                <strong>{activeEdge.label}</strong>
+                <p>
+                  {graphNodes.find((node) => node.id === activeEdge.from)?.label} to{" "}
+                  {graphNodes.find((node) => node.id === activeEdge.to)?.label}
+                </p>
+              </article>
+              <article className="graph-summary-card">
+                <span>Connected sources</span>
+                <strong>{sources.filter((source) => source.connected).length}</strong>
+                <p>{sources.length} total visible participants</p>
+              </article>
             </div>
 
             <div className="graph-stage">
+              <div className="graph-grid" aria-hidden></div>
+              <div className="graph-orbit graph-orbit-a" aria-hidden></div>
+              <div className="graph-orbit graph-orbit-b" aria-hidden></div>
+
+              <div className="graph-hud">
+                <span className="eyebrow">Selected Node</span>
+                <h2>{selectedDescriptor.label}</h2>
+                <p>{selectedDescriptor.detail}</p>
+                <div className="graph-hud-stats">
+                  <div>
+                    <span>Status</span>
+                    <strong>{selectedDescriptor.status}</strong>
+                  </div>
+                  <div>
+                    <span>Edges</span>
+                    <strong>
+                      {selectedDescriptor.inbound} in / {selectedDescriptor.outbound} out
+                    </strong>
+                  </div>
+                  <div>
+                    <span>Mode</span>
+                    <strong>{selectedDescriptor.accent}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="graph-flow-rail">
+                <span className="eyebrow">Live Flows</span>
+                <div className="graph-flow-list">
+                  {relatedFlows.map((flow) => (
+                    <article
+                      className={`graph-flow-item ${
+                        flow.active ? "graph-flow-item-active" : ""
+                      } ${flow.related ? "graph-flow-item-related" : ""}`}
+                      key={`${flow.from}-${flow.to}`}
+                    >
+                      <strong>{flow.label}</strong>
+                      <span>
+                        {flow.fromLabel} to {flow.toLabel}
+                      </span>
+                      <b>{flow.traffic} touches</b>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
               <svg className="graph-svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden>
                 {graphEdges.map((edge, index) => {
                   const from = graphNodes.find((node) => node.id === edge.from);
@@ -255,13 +424,16 @@ export function App() {
                 })}
               </svg>
 
-              {graphNodes.map((node) => (
+              {graphDescriptors.map((node) => (
                 <button
                   className={`graph-node graph-node-${node.type} ${
                     node.id === selectedId ? "graph-node-active" : ""
                   }`}
                   key={node.id}
-                  onClick={() => setSelectedId(node.id)}
+                  onClick={() => {
+                    setSelectedId(node.id);
+                    setDetailTab("inspector");
+                  }}
                   style={{
                     left: `${node.x}%`,
                     top: `${node.y}%`,
@@ -269,8 +441,18 @@ export function App() {
                   }}
                   type="button"
                 >
+                  <div className="graph-node-row">
+                    <span className="graph-node-kind">{node.accent}</span>
+                    <span className={`status-dot ${node.connected ? "status-dot-online" : "status-dot-idle"}`}></span>
+                  </div>
                   <strong>{node.label}</strong>
-                  <span>{node.type}</span>
+                  <p>{node.summary}</p>
+                  <div className="graph-node-meta">
+                    <span>{node.messageCount} msgs</span>
+                    <span>
+                      {node.inbound}/{node.outbound} edges
+                    </span>
+                  </div>
                 </button>
               ))}
             </div>
@@ -279,11 +461,12 @@ export function App() {
           <section className="panel terminal-panel">
             <div className="panel-head panel-head-inline">
               <div>
-                <span className="eyebrow">Message Feed</span>
-                <p>Claude Code, Codex, terminals, humans, and custom sources all render in one thread.</p>
+                <span className="eyebrow">Conversation Feed</span>
+                <p>The selected thread is the primary working surface.</p>
               </div>
-              <span className="status-pill">{feed.length} typed messages</span>
+              <span className="status-pill">{feed.length} messages</span>
             </div>
+
             <div className="demo-toolbar">
               <button className="search-button" onClick={() => void window.verbumApp.runLaunchDemo()} type="button">
                 Run 2-minute demo
@@ -304,6 +487,7 @@ export function App() {
                 </button>
               ))}
             </div>
+
             <div className="composer">
               <select onChange={(event) => setRouteTo(event.target.value)} value={routeTo}>
                 {sources.map((source) => (
@@ -312,16 +496,14 @@ export function App() {
                   </option>
                 ))}
               </select>
-              <input
-                onChange={(event) => setComposerValue(event.target.value)}
-                value={composerValue}
-              />
+              <input onChange={(event) => setComposerValue(event.target.value)} value={composerValue} />
               <button
                 onClick={() => {
                   const content = composerValue.trim();
                   if (!content) {
                     return;
                   }
+
                   void window.verbumApp.sendMessage({
                     routeTo,
                     content,
@@ -333,143 +515,172 @@ export function App() {
                 Send
               </button>
             </div>
-            <div className="message-feed">
-              {feed.map((message) => (
-                <MessageRenderer key={message.id} message={message} />
-              ))}
-            </div>
-            <div className="terminal-grid">
-              {terminals.map((terminal) => (
-                <article className="terminal-card" key={terminal.id}>
-                  <strong>{terminal.title}</strong>
-                  <pre>{terminal.lines.join("\n")}</pre>
-                </article>
-              ))}
+
+            <div className="feed-layout">
+              <div className="message-feed">
+                {feed.map((message) => (
+                  <MessageRenderer key={message.id} message={message} />
+                ))}
+              </div>
+
+              <div className="terminal-grid">
+                {terminals.map((terminal) => (
+                  <article className="terminal-card" key={terminal.id}>
+                    <div className="terminal-card-head">
+                      <strong>{terminal.title}</strong>
+                      <span>{compactPath(terminal.cwd)}</span>
+                    </div>
+                    <pre>{terminal.lines.join("\n")}</pre>
+                  </article>
+                ))}
+              </div>
             </div>
           </section>
         </main>
 
-        <aside className="right-column">
-          <section className="panel inspector-panel">
-            <div className="panel-head">
-              <span className="eyebrow">Inspector</span>
-              <h2>{selectedNode.label}</h2>
-              <p>{selectedNode.detail}</p>
-            </div>
-            <div className="inspector-metrics">
-              <div>
-                <span>Selected Source</span>
-                <strong>{selectedSource.name}</strong>
-              </div>
-              <div>
-                <span>Conversation</span>
-                <strong>
-                  {conversations.find((conversation) => conversation.id === selectedConversationId)?.title ??
-                    "Master conversation"}
-                </strong>
-              </div>
-              <div>
-                <span>Typed Support</span>
-                <strong>{selectedSource.typing}</strong>
-              </div>
-            </div>
-            <div className="thread">
-              {inboxThread.map((entry) => (
-                <article className="thread-item" key={`${entry.author}-${entry.route}`}>
-                  <strong>{entry.author}</strong>
-                  <span>{entry.route}</span>
-                  <p>{entry.text}</p>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="panel search-panel">
-            <div className="panel-head">
-              <span className="eyebrow">Conversational Search</span>
-              <p>Fast, local, and grounded in the launch docs.</p>
-            </div>
-            <form
-              className="search-form"
-              onSubmit={(event) => {
-                event.preventDefault();
-                const question = query.trim();
-                if (!question) {
-                  return;
-                }
-
-                const answer = answerQuery(question);
-                startTransition(() => {
-                  setSearchTurns((current) => [
-                    ...current,
-                    { role: "user", content: question },
-                    { role: "assistant", content: answer.summary, citations: answer.citations }
-                  ]);
-                });
-              }}
+        <aside className="detail-column panel">
+          <div className="detail-tabs">
+            <button
+              className={detailTab === "inspector" ? "detail-tab detail-tab-active" : "detail-tab"}
+              onClick={() => setDetailTab("inspector")}
+              type="button"
             >
-              <input
-                className="search-input"
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Ask about the launch story"
-                value={query}
-              />
-              <button className="search-button" type="submit">
-                Ask
-              </button>
-            </form>
+              Inspector
+            </button>
+            <button
+              className={detailTab === "search" ? "detail-tab detail-tab-active" : "detail-tab"}
+              onClick={() => setDetailTab("search")}
+              type="button"
+            >
+              Search
+            </button>
+          </div>
 
-            <div className="chip-row">
-              {[
-                "Why is this better than a dashboard?",
-                "How do terminals appear in the app?",
-                "Why skip collaboration for launch?"
-              ].map((chip) => (
-                <button className="chip" key={chip} onClick={() => setQuery(chip)} type="button">
-                  {chip}
-                </button>
-              ))}
-            </div>
+          {detailTab === "inspector" ? (
+            <div className="detail-panel-body">
+              <div className="panel-head">
+                <span className="eyebrow">Context</span>
+                <h2>{selectedDescriptor.label}</h2>
+                <p>{selectedDescriptor.detail}</p>
+              </div>
 
-            <div className="search-log">
-              {searchTurns.map((turn, index) => (
-                <article className={`search-turn search-turn-${turn.role}`} key={`${turn.role}-${index}`}>
-                  <span>{turn.role === "user" ? "You" : "Verbum Search"}</span>
-                  <p>{turn.content}</p>
-                  {turn.citations ? (
-                    <div className="citation-row">
-                      {turn.citations.map((citation) => (
-                        <b className="citation" key={citation.id}>
-                          {citation.kind}: {citation.title}
-                        </b>
-                      ))}
-                    </div>
-                  ) : null}
-                </article>
-              ))}
-            </div>
+              <div className="inspector-metrics">
+                <div>
+                  <span>Source</span>
+                  <strong>{selectedSource.name}</strong>
+                </div>
+                <div>
+                  <span>Thread</span>
+                  <strong>{selectedConversation?.title ?? "Master conversation"}</strong>
+                </div>
+                <div>
+                  <span>Typed support</span>
+                  <strong>{selectedSource.typing}</strong>
+                </div>
+              </div>
 
-            <div className="live-matches">
-              <strong>Live matches</strong>
-              <ul>
-                {liveMatches.map(({ document, score }) => (
-                  <li key={document.id}>
+              <div className="thread">
+                {(selectedNodeMessages.length > 0 ? selectedNodeMessages : inboxThread).map((entry, index) => (
+                  <article className="thread-item" key={("id" in entry ? entry.id : `${entry.author}-${index}`)}>
+                    <strong>{"title" in entry ? entry.title : entry.author}</strong>
                     <span>
-                      {document.title} · {score}
+                      {"sourceLabel" in entry
+                        ? `${entry.sourceLabel} · ${entry.timestamp}`
+                        : entry.route}
                     </span>
-                    <p>{document.excerpt}</p>
-                  </li>
+                    <p>
+                      {"blocks" in entry
+                        ? entry.blocks
+                            .map((block) => ("text" in block ? block.text : "Structured event"))
+                            .join(" ")
+                        : entry.text}
+                    </p>
+                  </article>
                 ))}
-              </ul>
+              </div>
             </div>
-            <div className="custom-source-card">
-              <strong>Bring your own source</strong>
-              <p>
-                If another system can emit typed message blocks, Verbum can render it beside Claude Code
-                and Codex without a custom one-off pane.
-              </p>
+          ) : (
+            <div className="detail-panel-body">
+              <div className="panel-head">
+                <span className="eyebrow">Conversational Search</span>
+                <p>Ask when you need context. Otherwise stay in the thread.</p>
+              </div>
+
+              <form
+                className="search-form"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  const question = query.trim();
+                  if (!question) {
+                    return;
+                  }
+
+                  const answer = answerQuery(question);
+                  startTransition(() => {
+                    setSearchTurns((current) => [
+                      ...current,
+                      { role: "user", content: question },
+                      { role: "assistant", content: answer.summary, citations: answer.citations }
+                    ]);
+                  });
+                }}
+              >
+                <input
+                  className="search-input"
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Ask about the graph, threads, or launch"
+                  value={query}
+                />
+                <button className="search-button" type="submit">
+                  Ask
+                </button>
+              </form>
+
+              <div className="chip-row">
+                {[
+                  "Why is this better than a dashboard?",
+                  "How do terminals appear in the app?",
+                  "Why keep the master thread central?"
+                ].map((chip) => (
+                  <button className="chip" key={chip} onClick={() => setQuery(chip)} type="button">
+                    {chip}
+                  </button>
+                ))}
+              </div>
+
+              <div className="search-log">
+                {searchTurns.map((turn, index) => (
+                  <article className={`search-turn search-turn-${turn.role}`} key={`${turn.role}-${index}`}>
+                    <span>{turn.role === "user" ? "You" : "Verbum Search"}</span>
+                    <p>{turn.content}</p>
+                    {turn.citations ? (
+                      <div className="citation-row">
+                        {turn.citations.map((citation) => (
+                          <b className="citation" key={citation.id}>
+                            {citation.kind}: {citation.title}
+                          </b>
+                        ))}
+                      </div>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+
+              <div className="live-matches">
+                <strong>Live matches</strong>
+                <ul>
+                  {liveMatches.map(({ document, score }) => (
+                    <li key={document.id}>
+                      <span>
+                        {document.title} · {score}
+                      </span>
+                      <p>{document.excerpt}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-          </section>
+          )}
         </aside>
       </div>
     </div>

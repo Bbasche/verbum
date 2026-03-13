@@ -6,7 +6,7 @@ export default function DocsPage() {
       <header>
         <div className="hinner">
           <Link href="/" className="wordmark">
-            Verbum<span className="wdot"></span>
+            <img alt="Verbum" className="wordmark-image" src="/brand/verbum-logo-light.png" />
           </Link>
           <nav>
             <Link href="/">Home</Link>
@@ -19,6 +19,7 @@ export default function DocsPage() {
 
       <section className="docs-hero">
         <div className="container">
+          <img alt="Verbum" className="hero-logo" src="/brand/verbum-logo-light.png" />
           <p className="hlabel">Docs</p>
           <h1>
             Build with the framework.

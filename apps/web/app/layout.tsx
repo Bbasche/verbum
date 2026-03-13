@@ -23,7 +23,16 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "Verbum",
   description:
-    "Everything is a conversation. Verbum turns models, terminals, humans, and tools into one observable message graph."
+    "Everything is a conversation. Verbum turns models, terminals, humans, and tools into one observable message graph.",
+  icons: {
+    icon: [
+      { url: "/brand/verbum-favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/brand/verbum-favicon-64.png", sizes: "64x64", type: "image/png" },
+      { url: "/brand/verbum-favicon-128.png", sizes: "128x128", type: "image/png" }
+    ],
+    shortcut: "/brand/verbum-favicon-32.png",
+    apple: "/brand/verbum-icon-on-white.png"
+  }
 };
 
 export default function RootLayout({

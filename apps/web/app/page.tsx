@@ -6,7 +6,7 @@ export default function HomePage() {
       <header>
         <div className="hinner">
           <Link href="/" className="wordmark">
-            Verbum<span className="wdot"></span>
+            <img alt="Verbum" className="wordmark-image" src="/brand/verbum-logo-light.png" />
           </Link>
           <nav>
             <a href="#why">Why</a>
@@ -22,6 +22,7 @@ export default function HomePage() {
 
       <section className="hero">
         <div className="container">
+          <img alt="Verbum" className="hero-logo" src="/brand/verbum-logo-light.png" />
           <p className="hlabel">Open source · MIT · TypeScript</p>
           <h1>
             Everything is a
@@ -338,7 +339,7 @@ router.register(new MemoryActor({ id: "memory" }))`}</pre>
       <footer>
         <div className="finner">
           <div className="wordmark">
-            Verbum<span className="wdot"></span>
+            <img alt="Verbum" className="wordmark-image" src="/brand/verbum-logo-light.png" />
           </div>
           <div className="flinks">
             <Link href="/docs">Docs</Link>

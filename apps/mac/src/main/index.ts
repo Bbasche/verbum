@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, nativeTheme } from "electron";
+import { app, BrowserWindow, ipcMain, nativeImage, nativeTheme } from "electron";
 import { join } from "node:path";
 
 import { BridgeManager } from "./bridge-manager.js";
@@ -13,9 +13,10 @@ function createWindow(): void {
     height: 980,
     minWidth: 1280,
     minHeight: 840,
-    backgroundColor: "#0a0908",
+    backgroundColor: "#18130f",
     titleBarStyle: "hiddenInset",
     trafficLightPosition: { x: 20, y: 18 },
+    icon: join(process.cwd(), "apps/mac/build/icon.png"),
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       contextIsolation: true,
@@ -31,6 +32,11 @@ function createWindow(): void {
 }
 
 app.whenReady().then(() => {
+  const dockIcon = nativeImage.createFromPath(join(process.cwd(), "apps/mac/build/icon.png"));
+  if (!dockIcon.isEmpty() && process.platform === "darwin" && app.dock) {
+    app.dock.setIcon(dockIcon);
+  }
+
   bridgeManager.start();
 
   ipcMain.handle("verbum:get-snapshot", () => bridgeManager.getSnapshot());
