@@ -764,7 +764,12 @@ export function App() {
                     return null;
                   }
 
-                  const curve = `M ${from.x} ${from.y} C ${from.x} ${(from.y + to.y) / 2 - 12}, ${to.x} ${(from.y + to.y) / 2 + 12}, ${to.x} ${to.y}`;
+                  const mx = (from.x + to.x) / 2;
+                  const my = (from.y + to.y) / 2;
+                  const dx = Math.abs(to.x - from.x);
+                  const dy = Math.abs(to.y - from.y);
+                  const tension = Math.max(dx, dy) * 0.35;
+                  const curve = `M ${from.x} ${from.y} C ${from.x + (to.x > from.x ? tension : -tension)} ${from.y}, ${to.x + (from.x > to.x ? tension : -tension)} ${to.y}, ${to.x} ${to.y}`;
                   return (
                     <g key={`${edge.from}-${edge.to}`}>
                       <path
