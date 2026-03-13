@@ -13,6 +13,7 @@ export default function HomePage() {
             <a href="#actors">Actors</a>
             <a href="#app">Mac App</a>
             <Link href="/docs">Docs</Link>
+            <Link href="/blog">Blog</Link>
             <a href="https://github.com/Bbasche/verbum-ai" className="ncta">
               GitHub →
             </a>
@@ -342,6 +343,7 @@ router.register(new MemoryActor({ id: "memory" }))`}</pre>
           </div>
           <div className="flinks">
             <Link href="/docs">Docs</Link>
+            <Link href="/blog">Blog</Link>
             <a href="https://github.com/Bbasche/verbum-ai">GitHub</a>
           </div>
           <div className="fmit">MIT licensed · built in public</div>

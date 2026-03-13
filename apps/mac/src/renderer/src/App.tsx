@@ -68,6 +68,31 @@ function titleCase(value: string): string {
   return value.replace(/-/g, " ").replace(/\b\w/g, (match) => match.toUpperCase());
 }
 
+function graphCategoryLabel(
+  kind: SourceDescriptor["kind"] | (typeof graphNodes)[number]["type"] | undefined
+): string {
+  switch (kind) {
+    case "claude-code":
+      return "Claude";
+    case "codex":
+      return "Codex";
+    case "terminal":
+      return "Terminal";
+    case "human":
+      return "Human";
+    case "memory":
+      return "Search";
+    case "custom":
+      return "Custom";
+    case "router":
+      return "App";
+    case "model":
+      return "Model";
+    default:
+      return kind ? titleCase(kind) : "Source";
+  }
+}
+
 export function App() {
   const [activeTab, setActiveTab] = useState<AppTab>("chat");
   const [selectedId, setSelectedId] = useState("verbum-app");
@@ -173,7 +198,7 @@ export function App() {
       source,
       connected,
       status,
-      mode: source?.mode ?? titleCase(node.type),
+      category: graphCategoryLabel(source?.kind ?? node.type),
       messageCount,
       inbound,
       outbound
@@ -848,7 +873,7 @@ export function App() {
                     <strong>{node.label}</strong>
                     <span className={`status-dot ${node.connected ? "status-dot-online" : "status-dot-idle"}`}></span>
                   </div>
-                  <span className="graph-node-kind">{node.mode}</span>
+                  <span className="graph-node-kind">{node.category}</span>
                   <div className="graph-node-stats">
                     <b>{node.messageCount}</b>
                     <span>{node.status}</span>
@@ -877,8 +902,8 @@ export function App() {
                 </strong>
               </div>
               <div>
-                <span>Mode</span>
-                <strong>{focusedDescriptor.mode}</strong>
+                <span>Category</span>
+                <strong>{focusedDescriptor.category}</strong>
               </div>
             </div>
 
