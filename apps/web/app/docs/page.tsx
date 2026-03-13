@@ -28,11 +28,28 @@ export default function DocsPage() {
           <p className="hsub">
             The website is static. The package and the Mac app do the real work.
           </p>
+          <div className="hact">
+            <a href="/download/mac" className="btnp">
+              Download for macOS
+            </a>
+            <a href="https://www.npmjs.com/package/@basche42/verbum" className="btns">
+              View npm package
+            </a>
+          </div>
         </div>
       </section>
 
       <section>
         <div className="container docs-shell">
+          <article className="doc-block">
+            <div className="slabel">Download</div>
+            <pre className="vcode">{`# Mac app
+open https://verbum-nine.vercel.app/download/mac
+
+# npm package
+npm install @basche42/verbum`}</pre>
+          </article>
+
           <article className="doc-block">
             <div className="slabel">Install</div>
             <pre className="vcode">{`git clone https://github.com/Bbasche/verbum.git

@@ -220,7 +220,7 @@ export const quickstartCode = `import {
   ProcessActor,
   MemoryActor,
   scriptedModel
-} from "verbum";
+} from "@basche42/verbum";
 
 const router = new Router({ maxDepth: 8 });
 
@@ -267,7 +267,7 @@ export const docSections = [
 
 export const launchChecklist = [
   "Point the Vercel project at `apps/web` and deploy.",
-  "Publish `verbum` with `npm publish --workspace verbum --access public`.",
+  "Publish `@basche42/verbum` with `npm publish --workspace packages/verbum --access public`.",
   "Push to GitHub and wire `NPM_TOKEN` for release automation.",
   "Record the 60-second demo with the Verbum App graph, Claude Code, Codex, and two live terminals.",
   "Post the announcement tweet, then immediately submit the Show HN with the replay clip and docs link."

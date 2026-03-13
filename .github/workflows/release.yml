@@ -5,8 +5,11 @@ on:
     types:
       - published
 
+permissions:
+  contents: write
+
 jobs:
-  publish:
+  publish-npm:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +20,24 @@ jobs:
           registry-url: https://registry.npmjs.org
           cache: npm
       - run: npm ci
-      - run: npm run build
-      - run: npm publish --workspace verbum --access public
+      - run: npm run build --workspace packages/verbum
+      - run: npm publish --workspace packages/verbum --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  build-mac-app:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run dist:mac --workspace @verbum/mac
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: apps/mac/release/Verbum.dmg

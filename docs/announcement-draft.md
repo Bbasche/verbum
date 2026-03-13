@@ -6,7 +6,7 @@ I’ve been building `Verbum`: an open-source TypeScript framework and Mac app w
 
 The app shows the whole machine talking to itself in one live graph.
 
-`npm install verbum`
+`npm install @basche42/verbum`
 
 Repo + demo below.
 
@@ -23,4 +23,3 @@ Once everything is a message, observability, replay, search, and human-in-the-lo
 This launch focuses on local single-machine orchestration first. Collaboration and P2P are intentionally next, not hand-waved.
 
 Would love feedback on the framework shape and the app direction.
-

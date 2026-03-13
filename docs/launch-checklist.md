@@ -2,7 +2,7 @@
 
 ## Product
 
-- Ship the core `verbum` package
+- Ship the core `@basche42/verbum` package
 - Ship the static docs/marketing site
 - Ship the native macOS app
 - Keep collaboration and P2P clearly marked as roadmap
@@ -16,9 +16,9 @@
 
 ## Package
 
-- Verify `npm run build --workspace verbum`
-- Verify `npm test --workspace verbum`
-- Publish with `npm publish --workspace verbum --access public`
+- Verify `npm run build --workspace packages/verbum`
+- Verify `npm test --workspace packages/verbum`
+- Publish with `npm publish --workspace packages/verbum --access public`
 
 ## Site
 
@@ -35,6 +35,6 @@
 ## Launch
 
 - Post the announcement clip on X
-- Immediately reply with the repo link, docs link, and `npm install verbum`
+- Immediately reply with the repo link, docs link, and `npm install @basche42/verbum`
 - Submit Show HN with the same clip and a short honest explanation
 - Stay online for the first two hours and answer comments fast

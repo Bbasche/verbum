@@ -33,6 +33,9 @@ export default function HomePage() {
             humans, a seat at the table. They send messages. They receive messages. The rest is routing.
           </p>
           <div className="hact">
+            <a href="/download/mac" className="btnp">
+              Download for macOS
+            </a>
             <Link href="/docs" className="btnp">
               Get started →
             </Link>
@@ -45,7 +48,7 @@ export default function HomePage() {
           <div className="wide">
             <div className="icmd">
               <span className="p">$</span>
-              <span className="c">npm install verbum</span>
+              <span className="c">npm install @basche42/verbum</span>
             </div>
             <div className="ibadges">
               <span className="badge g">MIT</span>
@@ -190,7 +193,7 @@ export default function HomePage() {
               <span className="ctitle">agent.ts</span>
               <span></span>
             </div>
-            <pre className="vcode">{`import { Router, ModelActor, ProcessActor, MemoryActor, scriptedModel } from "verbum"
+            <pre className="vcode">{`import { Router, ModelActor, ProcessActor, MemoryActor, scriptedModel } from "@basche42/verbum"
 
 const router = new Router()
 
@@ -204,7 +207,7 @@ router.register(new ModelActor({
         from: "claude",
         to: "shell",
         role: "assistant",
-        content: { type: "text", text: "npm test --workspace verbum" }
+        content: { type: "text", text: "npm test --workspace packages/verbum" }
       }
     }
 
@@ -302,6 +305,12 @@ router.register(new MemoryActor({ id: "memory" }))`}</pre>
               <div className="imode ws">Extensible</div>
             </div>
           </div>
+          <div className="app-download">
+            <a href="/download/mac" className="btnp">
+              Download the Mac app DMG
+            </a>
+            <span>Runs the live Verbum client for Claude Code, Codex, terminals, and search.</span>
+          </div>
         </div>
       </section>
 
@@ -313,6 +322,9 @@ router.register(new MemoryActor({ id: "memory" }))`}</pre>
             MIT licensed. Built in public. The docs site is static. The Mac app is where the live integrations run.
           </p>
           <div className="ctarow">
+            <a href="/download/mac" className="btnp">
+              Download for macOS
+            </a>
             <Link href="/docs" className="btnp">
               Read the docs
             </Link>

@@ -19,7 +19,7 @@ Make the audience feel one idea viscerally: Claude Code, Codex, your terminals, 
 - open the Mac app and make sure `Master conversation` is visible
 - have Claude Code already authenticated locally
 - have Codex already authenticated locally
-- keep the repo at a clean point where `npm test --workspace verbum` is green
+- keep the repo at a clean point where `npm test --workspace packages/verbum` is green
 - if possible, leave one recent Claude task in `~/.claude/tasks` so the watcher has something to show
 
 ### 1. Open with the punchline
@@ -57,7 +57,7 @@ Visual:
 - Run the app's `Run 2-minute demo` button
 - Codex returns a structured answer in the message feed
 - Claude Code returns a launch-ready explanation with a code block
-- `zsh · repo` runs `npm test --workspace verbum`
+- `zsh · repo` runs `npm test --workspace packages/verbum`
 - `zsh · machine` shows a few `~/.claude/tasks` files so the companion story feels real
 
 ### 4. Land the search moment
@@ -84,7 +84,7 @@ Visual:
 
 - Zoom out to show the full graph again
 - Leave the message bus and inbox visible
-- End with the repo URL and `npm install verbum`
+- End with the repo URL and `npm install @basche42/verbum`
 
 ## Recording notes
 
@@ -97,14 +97,14 @@ Visual:
 
 - Ask Codex for a sharp three-bullet architectural explanation
 - Ask Claude Code for a launch-ready explanation plus one code block
-- Run `npm test --workspace verbum` in the repo shell
+- Run `npm test --workspace packages/verbum` in the repo shell
 - Run `find ~/.claude/tasks -maxdepth 2 -type f | head -n 6` in the machine shell
 - Run `find packages/verbum/src -maxdepth 2 -type f | sort` to show the code surface quickly
 - If you want one extra flex: start a custom JSONL source and let it appear in the same feed
 
 ## Best terminal moments
 
-- `npm test --workspace verbum`
+- `npm test --workspace packages/verbum`
 - `find packages/verbum/src -maxdepth 2 -type f | sort`
 - `find ~/.claude/tasks -maxdepth 2 -type f | head -n 6`
 - `git status --short`

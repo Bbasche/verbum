@@ -2,16 +2,76 @@
 
 Everything is a conversation.
 
-Verbum is an open-source TypeScript framework and native macOS command center for systems built out of models, terminals, tools, memory, and humans. Instead of hiding orchestration behind callbacks and logs, Verbum turns every interesting interaction into a message you can route, replay, inspect, and eventually search.
+Verbum is an open-source TypeScript framework and native macOS app for orchestrating models, terminals, tools, memory, and humans as one readable message system. The framework gives you a common actor model. The Mac app gives you a live command center for Claude Code, Codex, shell sessions, search, and human interrupts.
 
-## What is in this repo
+## Links
 
-- `packages/verbum`: the publishable npm package with the Router, built-in actors, message helpers, and tests
-- `apps/web`: the static marketing/docs site for Vercel
-- `apps/mac`: the native Electron-based macOS app with the graph, inbox, terminal, and search surfaces
-- `docs`: launch collateral, demo script, and announcement drafts
+- Site: [verbum-nine.vercel.app](https://verbum-nine.vercel.app)
+- Docs: [verbum-nine.vercel.app/docs](https://verbum-nine.vercel.app/docs)
+- npm: [npmjs.com/package/@basche42/verbum](https://www.npmjs.com/package/@basche42/verbum)
+- Mac app DMG: [github.com/Bbasche/verbum/releases/latest/download/Verbum.dmg](https://github.com/Bbasche/verbum/releases/latest/download/Verbum.dmg)
+- Mac app setup: [github.com/Bbasche/verbum/blob/main/docs/mac-app-setup.md](https://github.com/Bbasche/verbum/blob/main/docs/mac-app-setup.md)
+- Package docs: [github.com/Bbasche/verbum/blob/main/packages/verbum/README.md](https://github.com/Bbasche/verbum/blob/main/packages/verbum/README.md)
 
-## Quick start
+## Install The Framework
+
+```bash
+npm install @basche42/verbum
+```
+
+```ts
+import {
+  MemoryActor,
+  ModelActor,
+  ProcessActor,
+  Router,
+  scriptedModel
+} from "@basche42/verbum";
+
+const router = new Router({ maxDepth: 8 });
+
+router.register(
+  new ModelActor({
+    id: "claude",
+    provider: "anthropic",
+    model: "claude-sonnet",
+    adapter: scriptedModel(({ message }) => {
+      if (message.from === "user") {
+        return {
+          from: "claude",
+          to: "shell",
+          role: "assistant",
+          content: { type: "text", text: "npm test" }
+        };
+      }
+
+      return "Build is green. Ship it.";
+    })
+  })
+);
+
+router.register(new ProcessActor({ id: "shell" }));
+router.register(new MemoryActor({ id: "memory" }));
+```
+
+## Run The Mac App
+
+```bash
+git clone https://github.com/Bbasche/verbum.git
+cd verbum
+npm install
+npm run dev --workspace @verbum/mac
+```
+
+The app can:
+
+- watch Claude task files in `~/.claude/tasks`
+- send prompts to `claude`
+- send prompts to `codex exec --json`
+- run terminal commands in tracked sessions
+- render custom typed message streams from JSONL sources
+
+## Local Development
 
 ```bash
 npm install
@@ -19,55 +79,12 @@ npm run build
 npm test
 ```
 
-Run the docs/marketing site:
+Useful commands:
 
-```bash
-npm run dev --workspace @verbum/web
-```
-
-Run the native app:
-
-```bash
-npm run dev --workspace @verbum/mac
-```
-
-The Mac app is the live Verbum client. The docs site is static.
-
-It can:
-
-- watch Claude task files in `~/.claude/tasks`
-- send one-off prompts to `claude`
-- send one-off prompts to `codex exec --json`
-- run terminal commands in tracked sessions
-- render custom JSONL sources defined in `verbum.app.config.json`
-
-Build the publishable package:
-
-```bash
-npm run build --workspace verbum
-```
-
-## Why Verbum
-
-- Models, terminals, tools, and humans all implement the same conversational contract.
-- The Router records every hop, so observability is built into the abstraction instead of bolted on later.
-- The native app shows Claude Code, Codex, search, inbox, and terminals in one command-center view.
-- The launch story is intentionally focused on local orchestration first. Collaboration and P2P stay on the roadmap.
-
-## Launch surfaces
-
-- Docs site: static, clean, and ready for Vercel
-- Native app: live desktop shell for the graph/search/inbox story
-- npm package: lightweight framework package ready for publishing
-- Launch docs: demo script, launch checklist, and post drafts
-
-## Publish checklist
-
-1. Create the GitHub repo and push this monorepo.
-2. Point Vercel at `apps/web`.
-3. Publish `verbum` to npm.
-4. Wire `NPM_TOKEN` in GitHub Actions for release automation.
-5. Record the demo in the native app and post the launch assets from `docs/`.
+- `npm run dev --workspace @verbum/web`
+- `npm run dev --workspace @verbum/mac`
+- `npm run build --workspace packages/verbum`
+- `npm test --workspace packages/verbum`
 
 ## License
 

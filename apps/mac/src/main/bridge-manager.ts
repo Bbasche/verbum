@@ -84,7 +84,7 @@ export class BridgeManager extends EventEmitter<{
       demoCommands: [
         {
           label: "Run package tests",
-          command: "npm test --workspace verbum",
+          command: "npm test --workspace packages/verbum",
           sessionId: "shell-1"
         },
         {
@@ -225,7 +225,7 @@ export class BridgeManager extends EventEmitter<{
     await this.runTerminalCommand({
       conversationId: conversation.id,
       sessionId: "shell-1",
-      command: "npm test --workspace verbum"
+      command: "npm test --workspace packages/verbum"
     });
     await this.runTerminalCommand({
       conversationId: conversation.id,

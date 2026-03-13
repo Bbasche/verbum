@@ -8,3 +8,4 @@ coverage
 apps/web/.next
 packages/verbum/dist
 apps/mac/out
+apps/mac/release
