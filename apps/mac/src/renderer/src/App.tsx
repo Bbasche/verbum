@@ -17,16 +17,16 @@ type GraphFocus = "all" | "selected" | "live";
 
 const tabCopy: Record<AppTab, { title: string; description: string }> = {
   chat: {
-    title: "Master conversation first.",
-    description: "Keep the working thread clean, route to the right source, and inspect machine context only when you need it."
+    title: "Conversations across your machine, in one place.",
+    description: "Send prompts, review replies, and keep source context close at hand."
   },
   feed: {
-    title: "A global feed for the whole machine.",
-    description: "Watch bus activity, tool work, terminal output, and agent replies move through one live stream."
+    title: "Live activity from every connected source.",
+    description: "Follow agent replies, tool output, terminal work, and system events in one stream."
   },
   graph: {
-    title: "A systems map that earns its screen space.",
-    description: "Shrink the nodes, keep the signal, and let the inspector carry the detail instead of stuffing it into the canvas."
+    title: "A visual map of how work is moving.",
+    description: "Explore connected sources, inspect relationships, and trace activity through the graph."
   }
 };
 
@@ -358,7 +358,7 @@ export function App() {
             <div className="panel-head panel-head-inline">
               <div>
                 <span className="eyebrow">Threads</span>
-                <p>One master conversation, plus side threads when a task needs to split off.</p>
+                <p>Browse active conversations and open a new thread when you want a separate lane.</p>
               </div>
               <button
                 className="action-button"
@@ -524,8 +524,8 @@ export function App() {
                 <h2>{selectedConversation?.title ?? "Master conversation"}</h2>
                 <p>
                   {selectedConversation?.kind === "imported"
-                    ? `${selectedConversation.sourceLabel ?? "Imported"} thread mirrored into Verbum.`
-                    : "The working thread stays front and center."}
+                    ? `${selectedConversation.sourceLabel ?? "Imported"} conversation imported into Verbum.`
+                    : "Messages from connected sources appear here with their original structure preserved."}
                 </p>
               </div>
               <span className="status-pill">{threadMessages.length} messages</span>
@@ -650,8 +650,8 @@ export function App() {
             <div className="panel-head panel-head-inline">
               <div>
                 <span className="eyebrow">Global Feed</span>
-                <h2>Everything moving across the machine.</h2>
-                <p>A unified stream of bus events, model replies, tool activity, and terminal work.</p>
+                <h2>Recent activity across connected sources.</h2>
+                <p>Bus events, model replies, tool output, and terminal activity appear here in time order.</p>
               </div>
               <span className="status-pill">{globalMessages.length} total messages</span>
             </div>
@@ -731,7 +731,7 @@ export function App() {
               <div>
                 <span className="eyebrow">Conversation Graph</span>
                 <h2>System map, not decoration.</h2>
-                <p>Nodes shrink to fit. Inspector carries the detail.</p>
+                <p>View connected sources, active paths, and the relationships between conversations.</p>
               </div>
               <div className="graph-toolbar-shell">
                 {([
