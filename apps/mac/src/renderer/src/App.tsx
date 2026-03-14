@@ -903,13 +903,6 @@ export function App() {
           <span className="eyebrow">Mac App</span>
           <h1>{activeTabCopy.title}</h1>
           <p>{activeTabCopy.description}</p>
-          <div className="header-chips">
-            <span className="header-chip">{selectedConversation?.title ?? "Master conversation"}</span>
-            <span className="header-chip">Route {selectedSource.name}</span>
-            <span className="header-chip">
-              Master {masterAgent ? `${masterAgent.backendLabel} · ${masterAgent.modelLabel}` : "loading"}
-            </span>
-          </div>
         </div>
         <div className="topbar-metrics">
           <article className="metric-card">

@@ -193,26 +193,6 @@ button {
   color: var(--muted);
 }
 
-.header-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.header-chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 7px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(248, 243, 235, 0.08);
-  background: rgba(255, 255, 255, 0.025);
-  color: var(--muted);
-  font-family: "SF Mono", "JetBrains Mono", monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .topbar-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(148px, 1fr));
