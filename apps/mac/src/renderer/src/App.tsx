@@ -114,16 +114,16 @@ const graphBaseEdges: GraphEdgeRecord[] = [
 
 const tabCopy: Record<AppTab, { title: string; description: string }> = {
   chat: {
-    title: "One operator thread, backed by the whole machine.",
-    description: "Use the master agent, inspect imported Claude and Codex sessions, and keep live source context close."
+    title: "Chat",
+    description: "Talk with the master agent and review Claude, Codex, and terminal threads."
   },
   feed: {
-    title: "Live activity from every connected source.",
-    description: "Follow agent replies, tool output, terminal work, and system events in one stream."
+    title: "Global activity",
+    description: "Live messages and events from connected sources."
   },
   graph: {
-    title: "A visual map of how work is moving.",
-    description: "Explore connected sources, inspect relationships, and trace activity through the graph."
+    title: "Graph",
+    description: "Sources and threads on this machine."
   }
 };
 
@@ -145,7 +145,7 @@ function answerQuery(query: string): { summary: string; citations: SearchCitatio
   if (citations.length === 0) {
     return {
       summary:
-        "Verbum keeps the machine legible with a focused thread, a global activity feed, and a graph that explains how work is moving.",
+        "Verbum shows chats, activity, and graph relationships across the local machine.",
       citations: searchDocuments.slice(0, 2)
     };
   }
@@ -897,7 +897,7 @@ export function App() {
             <div className="panel-head panel-head-inline">
               <div>
                 <span className="eyebrow">Threads</span>
-                <p>Browse machine conversations by source and jump straight into the one you need.</p>
+                <p>Browse conversations by source.</p>
               </div>
               <button
                 className="action-button"
@@ -976,7 +976,7 @@ export function App() {
               <section className="setup-panel">
                 <div className="setup-panel-copy">
                   <span className="eyebrow">Setup Assistant</span>
-                  <h3>Finish the machine-level install.</h3>
+                  <h3>Complete setup.</h3>
                   <p>
                     Verbum App is installed, but the `verbum-ai` package and the background helper still
                     need to be set up on this machine.
@@ -1066,7 +1066,7 @@ export function App() {
                     </div>
                     <p>
                       {setupStatus?.gatekeeperWarning
-                        ? "This build is not notarized yet. If macOS blocks it, use Open Anyway in Privacy & Security or remove quarantine manually."
+                        ? "macOS may warn when opening this build. Use Open Anyway in Privacy & Security or remove quarantine manually."
                         : "macOS security checks look clean."}
                     </p>
                     <code className="setup-command">xattr -dr com.apple.quarantine /Applications/Verbum.app</code>
@@ -1109,7 +1109,7 @@ export function App() {
                   <div className="master-agent-copy">
                     <span className="eyebrow">Master Agent</span>
                     <p>
-                      The main operator thread should synthesize the week, track loose ends, and decide when to hand work to Claude, Codex, or terminals.
+                      Use this thread for summaries, reports, and routing.
                     </p>
                   </div>
                   <div className="master-agent-controls">
@@ -1236,9 +1236,9 @@ export function App() {
                 threadMessages.map((message) => <MessageRenderer key={message.id} message={message} />)
               ) : (
                 <article className="empty-state">
-                  <span className="eyebrow">Quiet thread</span>
-                  <h3>Nothing in this thread yet.</h3>
-                  <p>Route a prompt to Claude, Codex, or a terminal to start the conversation.</p>
+                  <span className="eyebrow">Empty</span>
+                  <h3>No messages yet.</h3>
+                  <p>Send a message to the master agent, Claude, Codex, or a terminal.</p>
                 </article>
               )}
             </div>
@@ -1248,7 +1248,7 @@ export function App() {
             <div className="panel-head">
               <span className="eyebrow">Details</span>
               <h2>{selectedConversation?.title ?? "Conversation"}</h2>
-              <p>Clean thread details, involved sources, and the current route target.</p>
+              <p>Participants, route target, and recent activity.</p>
             </div>
 
             <div className="inspector-metrics">
@@ -1288,7 +1288,7 @@ export function App() {
             <section className="thread-detail-section">
               <div className="panel-head">
                 <span className="eyebrow">Route target</span>
-                <p>Choose where the next message should go.</p>
+                <p>Select the next destination.</p>
               </div>
               <div className="source-palette">
                 {sources.map((source: SourceDescriptor) => (
@@ -1334,8 +1334,8 @@ export function App() {
             <div className="panel-head panel-head-inline">
               <div>
                 <span className="eyebrow">Global Feed</span>
-                <h2>One moving stream across the whole machine.</h2>
-                <p>Bus events, model replies, tool output, and terminal activity all live in the same realtime lane.</p>
+                <h2>Global activity</h2>
+                <p>Messages and events in one live stream.</p>
               </div>
               <span className="status-pill">{globalMessages.length} total messages</span>
             </div>
@@ -1352,7 +1352,7 @@ export function App() {
               <article className="graph-summary-card">
                 <span>Bus events</span>
                 <strong>{busEvents.length}</strong>
-                <p>Now merged directly into the same live feed.</p>
+                <p>Included in the live stream.</p>
               </article>
               <article className="graph-summary-card">
                 <span>Connected sources</span>
@@ -1399,8 +1399,8 @@ export function App() {
             <div className="panel-head panel-head-inline">
               <div>
                 <span className="eyebrow">Conversation Graph</span>
-                <h2>System map, not decoration.</h2>
-                <p>View connected sources, active paths, and the relationships between conversations.</p>
+                <h2>Graph</h2>
+                <p>Sources, threads, and connections.</p>
               </div>
               <div className="graph-toolbar-shell">
                 {([

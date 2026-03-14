@@ -67,7 +67,7 @@ interface RoutedModelOptions {
 export class BridgeManager extends EventEmitter<{
   snapshot: [snapshot: BridgeSnapshot];
 }> {
-  private readonly version = "0.1.4";
+  private readonly version = "0.1.5";
   private readonly workspaceRoot: string;
   private readonly verbumConfigDir = join(homedir(), ".config", "verbum");
   private readonly serviceLabel = "ai.verbum.helper";
@@ -263,8 +263,8 @@ export class BridgeManager extends EventEmitter<{
       [
         prompt,
         "",
-        "Use the Verbum cross-thread context below as authoritative machine history.",
-        "Reference concrete accomplishments, loose ends, next steps, and unresolved questions.",
+        "Use the cross-thread context below.",
+        "Cover accomplishments, loose ends, next steps, and unresolved questions when relevant.",
         "",
         injectAttachmentsIntoPrompt(contextPack.content, request.attachments)
       ].join("\n"),
@@ -695,7 +695,7 @@ export class BridgeManager extends EventEmitter<{
         },
         {
           type: "markdown",
-          text: "Ask for summaries, loose ends, next steps, or routing help. The master agent looks across your machine context before it answers."
+          text: "Use this chat for summaries, reports, and routing."
         }
       ]
     });
@@ -1148,8 +1148,7 @@ export class BridgeManager extends EventEmitter<{
     });
     const systemPrompt = buildMasterAgentSystemPrompt(this.workspaceRoot, conversation.title, this.masterAgentBackend);
     const composedPrompt = [
-      "Answer as Verbum's master agent.",
-      "Use the machine context below before you respond.",
+      "Use the machine context below.",
       "",
       prompt,
       "",
@@ -1944,14 +1943,13 @@ function buildMasterAgentSystemPrompt(
   backend: MasterAgentBackend
 ): string {
   return [
-    "You are Verbum's master agent.",
+    "You are the master agent for Verbum.",
     `Your current workspace root is ${workspaceRoot}.`,
     `You are responding inside the conversation titled "${conversationTitle}".`,
-    "Your job is to keep the machine-level conversation coherent across Claude Code, Codex, terminals, and imported threads.",
-    "Prioritize synthesis over theatrics.",
+    "Keep the conversation coherent across Claude Code, Codex, terminals, and imported threads.",
     "When you answer, explicitly cover accomplishments, loose ends, next steps, and unresolved questions when relevant.",
     "Only suggest delegation when it is genuinely useful, and make the handoff concrete.",
-    "Do not narrate hidden planning, internal implementation details, or UI concepts as if they were user-facing copy.",
+    "Do not include internal planning or implementation commentary in user-facing responses.",
     `Current backend: ${backend === "claude-code" ? "Claude Code using Claude Sonnet" : "Codex using its configured default model"}.`
   ].join("\n");
 }
