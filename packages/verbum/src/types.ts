@@ -1,11 +1,9 @@
 export type ActorType =
   | "model"
   | "process"
-  | "mcp"
   | "tool"
   | "human"
-  | "memory"
-  | "router";
+  | "memory";
 
 export type MessageRole = "user" | "assistant" | "system" | "tool";
 

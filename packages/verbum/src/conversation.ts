@@ -3,7 +3,7 @@ import type { ConversationSnapshot, Message } from "./types.js";
 export class Conversation {
   readonly id: string;
   readonly metadata: Record<string, unknown>;
-  readonly messages: Message[] = [];
+  private readonly _messages: Message[] = [];
   readonly participants = new Set<string>();
 
   constructor(id: string, metadata: Record<string, unknown> = {}) {
@@ -11,14 +11,23 @@ export class Conversation {
     this.metadata = metadata;
   }
 
+  getMessages(): readonly Message[] {
+    return Object.freeze([...this._messages]);
+  }
+
   add(message: Message): void {
-    this.messages.push(message);
+    this._messages.push(message);
     this.participants.add(message.from);
     this.participants.add(message.to);
   }
 
+  clear(): void {
+    this._messages.length = 0;
+    this.participants.clear();
+  }
+
   fork(fromMessageId: string): Conversation {
-    const index = this.messages.findIndex((message) => message.id === fromMessageId);
+    const index = this._messages.findIndex((message) => message.id === fromMessageId);
     if (index < 0) {
       throw new Error(`Message ${fromMessageId} not found in conversation ${this.id}`);
     }
@@ -28,7 +37,7 @@ export class Conversation {
       forkedFrom: fromMessageId
     });
 
-    for (const message of this.messages.slice(0, index + 1)) {
+    for (const message of this._messages.slice(0, index + 1)) {
       fork.add(message);
     }
 
@@ -40,9 +49,9 @@ export class Conversation {
       throw new Error("Replay speed must be greater than zero");
     }
 
-    for (let index = 0; index < this.messages.length; index += 1) {
-      const message = this.messages[index];
-      const next = this.messages[index + 1];
+    for (let index = 0; index < this._messages.length; index += 1) {
+      const message = this._messages[index];
+      const next = this._messages[index + 1];
       yield message;
 
       if (!next) {
@@ -58,7 +67,7 @@ export class Conversation {
     return {
       id: this.id,
       metadata: { ...this.metadata },
-      messages: [...this.messages],
+      messages: [...this._messages],
       participants: [...this.participants]
     };
   }

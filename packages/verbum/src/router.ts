@@ -15,24 +15,33 @@ export interface RouterEvents {
   message: [message: Message];
   dispatch: [message: Message, depth: number];
   settled: [conversationId: string];
+  error: [error: Error, message: Message, actor: Actor];
+  deadletter: [message: Message];
 }
 
 export interface RouterConfig {
   maxDepth?: number;
+  dispatchTimeoutMs?: number;
 }
 
 export class Router extends EventEmitter<RouterEvents> implements RouterLike {
   readonly maxDepth: number;
+  readonly dispatchTimeoutMs?: number;
   private readonly actors = new Map<string, Actor>();
   private readonly conversations = new Map<string, Conversation>();
 
   constructor(config: RouterConfig = {}) {
     super();
     this.maxDepth = config.maxDepth ?? 8;
+    this.dispatchTimeoutMs = config.dispatchTimeoutMs;
   }
 
   register(actor: Actor): void {
     this.actors.set(actor.id, actor);
+  }
+
+  unregister(actorId: string): boolean {
+    return this.actors.delete(actorId);
   }
 
   has(actorId: string): boolean {
@@ -56,6 +65,10 @@ export class Router extends EventEmitter<RouterEvents> implements RouterLike {
     const conversation = new Conversation(id);
     this.conversations.set(id, conversation);
     return conversation;
+  }
+
+  removeConversation(conversationId: string): boolean {
+    return this.conversations.delete(conversationId);
   }
 
   async send(messageLike: MessageDraft): Promise<Message[]> {
@@ -85,7 +98,7 @@ export class Router extends EventEmitter<RouterEvents> implements RouterLike {
     const edgeCounts = new Map<string, { from: string; to: string; conversationId: string; count: number; lastTimestamp: number }>();
 
     for (const conversation of this.conversations.values()) {
-      for (const message of conversation.messages) {
+      for (const message of conversation.getMessages()) {
         nodeCounts.set(message.from, (nodeCounts.get(message.from) ?? 0) + 1);
         nodeCounts.set(message.to, (nodeCounts.get(message.to) ?? 0) + 1);
 
@@ -119,7 +132,7 @@ export class Router extends EventEmitter<RouterEvents> implements RouterLike {
   }
 
   private async routeMessage(message: Message, depth: number): Promise<Message[]> {
-    if (depth > this.maxDepth) {
+    if (depth >= this.maxDepth) {
       throw new Error(`Maximum router depth of ${this.maxDepth} exceeded`);
     }
 
@@ -157,6 +170,7 @@ export class Router extends EventEmitter<RouterEvents> implements RouterLike {
 
     const actor = this.actors.get(message.to);
     if (!actor) {
+      this.emit("deadletter", message);
       return [message];
     }
 
@@ -171,7 +185,39 @@ export class Router extends EventEmitter<RouterEvents> implements RouterLike {
       })
     };
 
-    const responses = await actor.receive(message, actorContext);
+    let responses: MessageDraft[];
+    try {
+      const receivePromise = actor.receive(message, actorContext);
+
+      if (this.dispatchTimeoutMs != null) {
+        responses = await Promise.race([
+          receivePromise,
+          new Promise<never>((_resolve, reject) =>
+            setTimeout(
+              () => reject(new Error(`Actor "${actor.id}" timed out after ${this.dispatchTimeoutMs}ms`)),
+              this.dispatchTimeoutMs
+            )
+          )
+        ]);
+      } else {
+        responses = await receivePromise;
+      }
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.emit("error", err, message, actor);
+      this.record(
+        createMessage({
+          from: "system",
+          to: actor.id,
+          role: "system",
+          conversationId: message.conversationId,
+          parentId: message.id,
+          content: { type: "text", text: `Error in actor "${actor.id}": ${err.message}` }
+        })
+      );
+      return [message];
+    }
+
     const transcript: Message[] = [message];
 
     for (const response of responses) {

@@ -104,11 +104,10 @@ export default function HomePage() {
               <h3>ModelActor</h3>
               <p>Any LLM, wrapped uniformly. One line to swap providers.</p>
               <ul className="atags">
-                <li>Claude</li>
-                <li>OpenAI</li>
-                <li>Gemini</li>
-                <li>Ollama</li>
-                <li>OpenRouter</li>
+                <li>Anthropic (Claude)</li>
+                <li>OpenAI / GPT</li>
+                <li>OpenAI-compatible</li>
+                <li>Scripted / Mock</li>
               </ul>
             </div>
             <div className="acard">
@@ -125,12 +124,11 @@ export default function HomePage() {
             <div className="acard">
               <span className="aicon">⊛</span>
               <h3>MCPActor</h3>
-              <p>Speaks the Model Context Protocol natively and auto-discovers tools from any MCP server on connect.</p>
+              <p>Speaks the Model Context Protocol natively. Connect to any MCP server over stdio and auto-discover its tools.</p>
               <ul className="atags">
                 <li>stdio servers</li>
-                <li>SSE servers</li>
                 <li>Auto capability registry</li>
-                <li>Claude Code compatible</li>
+                <li>JSON-RPC transport</li>
               </ul>
             </div>
             <div className="acard">
@@ -149,9 +147,8 @@ export default function HomePage() {
               <p>A human is just another actor. Pause any flow, inject a response, resume. Native to the model.</p>
               <ul className="atags">
                 <li>stdin / CLI</li>
-                <li>WebSocket</li>
-                <li>Slack / Webhook</li>
-                <li>Nostr later</li>
+                <li>Custom transports</li>
+                <li>Pluggable interface</li>
               </ul>
             </div>
             <div className="acard">
@@ -160,9 +157,9 @@ export default function HomePage() {
               <p>Persistent context that participates in conversation. Ask it anything, it responds like an actor.</p>
               <ul className="atags">
                 <li>In-memory</li>
-                <li>SQLite</li>
-                <li>Vector backends</li>
-                <li>JSONL files</li>
+                <li>Keyword search</li>
+                <li>Conversation-scoped</li>
+                <li>Pluggable backends</li>
               </ul>
             </div>
             <div className="acard">
@@ -194,30 +191,27 @@ export default function HomePage() {
               <span className="ctitle">agent.ts</span>
               <span></span>
             </div>
-            <pre className="vcode">{`import { Router, ModelActor, ProcessActor, MemoryActor, scriptedModel } from "verbum-ai"
+            <pre className="vcode">{`import { Router, ModelActor, ProcessActor, MemoryActor, anthropicAdapter } from "verbum-ai"
 
 const router = new Router()
 
 router.register(new ModelActor({
   id: "claude",
   provider: "anthropic",
-  model: "claude-sonnet",
-  adapter: scriptedModel(({ message }) => {
-    if (message.from === "user") {
-      return {
-        from: "claude",
-        to: "shell",
-        role: "assistant",
-        content: { type: "text", text: "npm test --workspace packages/verbum" }
-      }
-    }
-
-    return "Build is green. Ship it."
-  })
+  model: "claude-sonnet-4-20250514",
+  adapter: anthropicAdapter()
 }))
 
 router.register(new ProcessActor({ id: "shell" }))
-router.register(new MemoryActor({ id: "memory" }))`}</pre>
+router.register(new MemoryActor({ id: "memory" }))
+
+await router.send({
+  from: "user",
+  to: "claude",
+  role: "user",
+  conversationId: "demo",
+  content: { type: "text", text: "Run the tests and tell me if we can ship." }
+})`}</pre>
           </div>
         </div>
       </section>
@@ -226,7 +220,7 @@ router.register(new MemoryActor({ id: "memory" }))`}</pre>
         <div className="container">
           <div className="slabel">Why it matters</div>
           <h2 className="section-title">
-            Four things you get for free
+            Five things you get for free
             <br />
             from the right abstraction.
           </h2>
@@ -250,6 +244,11 @@ router.register(new MemoryActor({ id: "memory" }))`}</pre>
               <div className="wnum">04</div>
               <h3>Composable without ceremony</h3>
               <p>An agent that uses a shell, an MCP server, and a memory store is three registered actors and a routing rule. No pipelines to wire. No abstractions to fight.</p>
+            </div>
+            <div className="witem">
+              <div className="wnum">05</div>
+              <h3>Middleware out of the box</h3>
+              <p>Logging, cost tracking, and rate limiting ship as built-in middleware. Write your own with a single function that wraps the dispatch chain.</p>
             </div>
           </div>
         </div>
